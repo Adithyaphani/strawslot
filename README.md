@@ -12,7 +12,13 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Hackathon](https://img.shields.io/badge/Social%20Impact%20Hackathon-2026-D9A93A?style=flat-square)
 ![Languages](https://img.shields.io/badge/languages-English%20%7C%20%E0%A8%AA%E0%A9%B0%E0%A8%9C%E0%A8%BE%E0%A8%AC%E0%A9%80%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A5%80-1C5C32?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-11%20passing-2F8F4E?style=flat-square)
-![Stack](https://img.shields.io/badge/stack-React%20%7C%20Express%20%7C%20Netlify-14211B?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-validation-3E67B1?style=flat-square)
+![Netlify](https://img.shields.io/badge/Netlify-Functions%20%2B%20Blobs-00C7B7?style=flat-square&logo=netlify&logoColor=white)
 
 [**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
 
@@ -192,16 +198,19 @@ The demo season is generated around today's date so the app always shows an acti
 ## 🏗️ Architecture
 
 ```
-Browser (React + Vite + Tailwind, Leaflet, Recharts)
-   │  /api/*
+Browser: React 18 + TypeScript + Vite + Tailwind, Leaflet, Recharts
+   │  /api/*   (typed client, retry on 502/503/504)
    ▼
-Netlify Function  ──  Express app (server/app.js)
-   │                    ├─ middleware: helmet, CORS, rate limits, Zod validation, signed officer tokens, error handler
-   │                    ├─ engine.js: deadlines, slot optimiser, risk, alerts, KPIs, baseline
-   │                    ├─ live.js: Open-Meteo + FIRMS with 30-min cache and fallbacks
-   │                    └─ messages.js: farmer SMS in pa / hi / en
+Netlify Function (esbuild-bundled ESM)  ──  Express 4 + TypeScript (server/app.ts)
+   │  Middleware chain
+   │    request-id/logging → helmet → CORS allow-list → JSON limit → rate limiter
+   │    → Zod validation → signed HMAC officer auth → 404 → central error handler
+   │  Routes   public.ts · farmer.ts · admin.ts
+   │  Services schedule.ts · briefing.ts
+   │  Lib      engine.ts (deadlines, slot optimiser, risk, alerts, KPIs)
+   │           live.ts (Open-Meteo + NASA FIRMS, cached, fallbacks) · messages.ts (pa/hi/en SMS)
    ▼
-Netlify Blobs (state JSON)   ·   local: server/data/local-state.json
+Netlify Blobs (state)   ·   local: JSON file / in-memory
 ```
 
 ---
@@ -213,12 +222,14 @@ Netlify Blobs (state JSON)   ·   local: server/data/local-state.json
 ```bash
 npm install
 npm run build
-npm start            # http://localhost:8787 (API + built frontend)
+npm start            # http://localhost:8787 (API + built frontend, run with tsx)
 ```
 
 Development with hot reload: `npm run dev` (API on 8787, Vite on 5173).
 
-Tests: `npm test` runs 11 engine tests covering capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, and optimiser vs baseline.
+Type-check: `npm run typecheck` (strict-ish TypeScript across server and client).
+
+Tests: `npm test` (node:test via tsx) runs 11 engine tests covering capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, and optimiser vs baseline.
 
 <details>
 <summary><b>API reference</b></summary>

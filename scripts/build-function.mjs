@@ -5,7 +5,7 @@
 import { build } from 'esbuild';
 
 await build({
-  entryPoints: ['netlify/src/api.js'],
+  entryPoints: ['netlify/src/api.ts'],
   outfile: 'netlify/functions/api.mjs',
   bundle: true,
   platform: 'node',
