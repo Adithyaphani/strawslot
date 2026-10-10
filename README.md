@@ -1,68 +1,196 @@
+<div align="center">
+
+<img src="public/favicon.svg" width="72" alt="StrawSlot logo" />
+
 # StrawSlot
 
-**A deadline-aware scheduler that books crop-residue machines, tractors and straw pickups before each farmer's sowing deadline, so small farmers don't burn paddy straw for lack of time.**
+**Book the machine before the fire.**
 
-Social Impact Hackathon 2026 (Cloud Counselage x DTI) · Theme: **Climate & Sustainability**
+A deadline-aware scheduler that books crop-residue machines, tractors and straw pickups<br/>before each farmer's sowing deadline, so small farmers don't burn paddy straw for lack of time.
+
+![Theme](https://img.shields.io/badge/theme-Climate%20%26%20Sustainability-2F8F4E?style=flat-square)
+![Hackathon](https://img.shields.io/badge/Social%20Impact%20Hackathon-2026-D9A93A?style=flat-square)
+![Languages](https://img.shields.io/badge/languages-English%20%7C%20%E0%A8%AA%E0%A9%B0%E0%A8%9C%E0%A8%BE%E0%A8%AC%E0%A9%80%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A5%80-1C5C32?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-11%20passing-2F8F4E?style=flat-square)
+![Stack](https://img.shields.io/badge/stack-React%20%7C%20Express%20%7C%20Netlify-14211B?style=flat-square)
+
+[**Live demo**](#judge-access) · [**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
+
+<br/>
+
+<img src="docs/banner.png" alt="StrawSlot farmer app on a phone and the officer dashboard in a browser" width="100%" />
+
+</div>
 
 ---
 
-## The problem
+## 🔥 The problem
 
-Small farmers burn paddy straw because no one schedules machines, tractors and pickups before each field's sowing deadline; apps only list machines.
+> **Small farmers burn paddy straw because no one schedules machines, tractors and pickups before each field's sowing deadline; apps only list machines.**
 
-- After paddy harvest a farmer has roughly **15–18 days** to clear straw and sow wheat.
-- Clearing needs a machine, a tractor powerful enough to pull it (Super Seeder: 55 HP+), and, for baling, a straw pickup.
-- Booking apps show that machines exist, not whether one will reach *your* field *before your deadline*. Field studies (CEEW) report rental delays, poor logistics and uncertainty as the reasons farmers fall back on fire.
+<table>
+<tr>
+<td width="33%" valign="top">
 
-## What StrawSlot does
+### ⏱️ 15–18 days
+After paddy harvest, that's all the time a farmer has to clear straw and sow wheat. When the machine is late, fire is the only option that always works on time.
 
-| | Farmer side (no login) | Officer side (login) |
-|---|---|---|
-| Who | Small and marginal paddy farmers | District / block crop-residue nodal officers |
-| Language | English by default with Punjabi shown alongside; full Punjabi or Hindi on tap | English, Punjabi |
-| Key screens | Book a machine (3-step wizard), check my booking, straw value calculator | District overview, early warnings, dispatch board, fields, what-if planner, machines & centres, activity log |
+</td>
+<td width="33%" valign="top">
 
-**Core engine**
+### 🚜 3 things at once
+Clearing needs a machine, a tractor strong enough to pull it (Super Seeder: 55 HP+), and for baling, a straw pickup. Small farmers often own none of these.
 
-1. **Deadline per field** = harvest date + sowing window.
-2. **Slot optimiser**: day-by-day simulation, least-slack-first, matches machine type to the farmer's straw plan, enforces tractor horsepower and hiring-centre tractor limits, clusters nearby fields by travel distance, blocks rain days from the live forecast, books straw pickups for baled fields.
-3. **Burn-risk score (0–100)** from schedule slack, tractor access, distance to a hiring centre and nearby satellite fire hotspots.
-4. **Early warnings** a week ahead with ranked one-click fixes (borrow a machine from another centre, switch to baling, pair a tractor).
-5. **Honest benefit measurement**: the same engine also runs a first-come-first-served baseline (how booking apps behave today) and shows both.
+</td>
+<td width="33%" valign="top">
 
-**Extra features**
+### 📋 Listed, not scheduled
+Booking apps show that machines exist, not whether one reaches *your* field *before your deadline*. Field studies (CEEW) blame delays and uncertainty.
 
-- Farmer SMS text in Punjabi / Hindi / English with WhatsApp share
-- Farmer "report a problem" flows straight into the officer's queue
-- Officer AI briefing (Claude API if a key is set, rule-based otherwise), shown in English or Punjabi
-- One-click **Auto-fix** per field and **Auto-fix district** sweep: only applies a reassignment if it gets the field in on time *and* lowers the district's total at-risk count
-- Live booking preview for farmers: sowing window, days left and which machines their tractor can pull
-- Illustrated, responsive farmer and landing pages; bilingual officer console (risk reasons, fixes and briefing are localised too)
-- What-if planner: add machines, repair idle ones or rent tractors, and see the change in on-time %
-- Officer overrides (pin a field to a machine), machine maintenance toggle, CSV export
-- Live weather, PM2.5 (Sangrur vs Delhi) and NASA FIRMS fire hotspots
+</td>
+</tr>
+</table>
 
-## Data: live vs simulated
+---
+
+<a id="how-it-works"></a>
+
+## 🌾 How it works
+
+```
+ Farmer books           Engine schedules           Officer acts early          Field cleared
+ ─────────────    ─▶    ─────────────────    ─▶    ──────────────────    ─▶    ─────────────
+ village, acres,        every field slotted        fields that will miss        seeded into soil
+ harvest date,          before its own deadline    are flagged a week ahead     or baled and sold.
+ tractor (HP)           with live rain forecast    with a one-click fix         No fire.
+```
+
+| Step | What happens |
+|---|---|
+| **1. Deadline per field** | `deadline = harvest date + sowing window` (default 16 days, editable by the farmer) |
+| **2. Slot optimiser** | Day-by-day simulation, least-slack-first. Matches machine type to the straw plan, enforces tractor horsepower and hiring-centre tractor limits, clusters nearby fields by road distance, skips rain days from the live forecast, books straw pickups for baled fields |
+| **3. Burn-risk score (0–100)** | From schedule slack, tractor access, distance to a hiring centre and nearby satellite fire hotspots |
+| **4. Early warnings** | Projected misses surface a week ahead with ranked fixes: borrow a machine from another centre, switch to baling, pair a tractor |
+| **5. Honest comparison** | The same engine also runs a first-come-first-served baseline (how booking apps behave today), so the benefit is measured, not claimed |
+
+---
+
+<a id="screenshots"></a>
+
+## 📸 Screenshots
+
+### Farmer side · no login · English with Punjabi alongside
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/farmer-home.png" alt="Farmer home page" /><p align="center"><b>Home</b> · book in one minute, call any hiring centre</p></td>
+<td width="50%"><img src="docs/screenshots/farmer-booking.png" alt="Booking form with live preview" /><p align="center"><b>Booking</b> · live preview of the sowing window and machines your tractor can pull</p></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/farmer-booked.png" alt="Booked slot result" /><p align="center"><b>Slot booked</b> · machine date, deadline countdown, SMS and WhatsApp share</p></td>
+<td width="50%"><img src="docs/screenshots/landing.png" alt="Public landing page" /><p align="center"><b>Landing</b> · StrawSlot vs first-come booking, scheduled against today's weather</p></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="25%"><img src="docs/screenshots/mobile-farmer.png" alt="Farmer home on a phone" /></td>
+<td width="25%"><img src="docs/screenshots/mobile-slot.png" alt="Booking lookup on a phone" /></td>
+<td width="50%" valign="middle">
+
+**Built for the phone in a farmer's pocket**
+
+- Big tap targets and a bottom menu
+- English by default, Punjabi beside every heading and button
+- Full ਪੰਜਾਬੀ or हिंदी in one tap
+- No app install, no login, no password
+- "Report a problem" goes straight to the block officer
+
+</td>
+</tr>
+</table>
+
+### Officer console · login · English / ਪੰਜਾਬੀ
+
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshots/officer-dashboard.png" alt="District overview dashboard" /><p align="center"><b>District overview</b> · risk map, fire hotspots, weather, air quality, daily briefing</p></td>
+<td width="50%"><img src="docs/screenshots/officer-dashboard-pa.png" alt="Dashboard in Punjabi" /><p align="center"><b>Same view in Punjabi</b> · reasons, fixes and briefing are translated too</p></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/officer-alerts.png" alt="Early warnings" /><p align="center"><b>Early warnings</b> · every at-risk field with ranked fixes and Auto-fix</p></td>
+<td width="50%"><img src="docs/screenshots/officer-dispatch.png" alt="Dispatch board" /><p align="center"><b>Dispatch board</b> · every machine, every day, rain days blocked</p></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/screenshots/officer-field.png" alt="Field detail drawer" /><p align="center"><b>Field detail</b> · why the risk score, work plan, reassign in two clicks</p></td>
+<td width="50%"><img src="docs/screenshots/officer-whatif.png" alt="What-if planner" /><p align="center"><b>What-if planner</b> · test new machines or tractors before buying</p></td>
+</tr>
+</table>
+
+> Map tiles and web fonts were blocked in the environment that took these screenshots; they load normally on the deployed site.
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**For farmers**
+- 3-step booking with a live sowing-window preview
+- Instant slot: machine, hiring centre, date, deadline countdown
+- SMS text in English, Punjabi or Hindi, with WhatsApp share
+- Straw value calculator: bale income, nutrients kept, smoke avoided
+- Report a late machine or changed harvest date
+
+</td>
+<td width="50%" valign="top">
+
+**For officers**
+- District KPIs, risk map, live fires, weather and PM2.5
+- Daily briefing (Claude API if a key is set, rule-based otherwise)
+- **Auto-fix** per field and **Auto-fix district**: only applies a change if it gets the field in on time *and* lowers the district's at-risk count
+- Dispatch board, maintenance toggle, officer overrides, CSV export
+- What-if planner and full activity log
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📊 Data: live vs simulated
 
 | Data | Source | Status |
 |---|---|---|
-| Rain, temperature, wind (16-day) | Open-Meteo forecast API | **Live**, no key |
-| PM2.5 / US AQI | Open-Meteo air-quality API | **Live**, no key |
-| Satellite fire hotspots (VIIRS, 7 days) | NASA FIRMS | **Live** with a free `FIRMS_MAP_KEY`; labelled sample otherwise |
-| Farms, farmers, machines, hiring centres | Generated for Sangrur district | **Simulated** (block towns use approximate real coordinates) |
-| Fields booked through the app | Users | **Real**, stored and scheduled |
+| Rain, temperature, wind (16-day) | Open-Meteo forecast API | 🟢 **Live**, no key |
+| PM2.5 / US AQI (Sangrur and Delhi) | Open-Meteo air-quality API | 🟢 **Live**, no key |
+| Satellite fire hotspots (VIIRS, 7 days) | NASA FIRMS | 🟢 **Live** with a free `FIRMS_MAP_KEY`, labelled sample otherwise |
+| Farms, farmers, machines, hiring centres | Generated for Sangrur district | 🟡 **Simulated** (block towns use approximate real coordinates) |
+| Fields booked through the app | Users | 🟢 **Real**, stored and scheduled |
 
 Impact factors per tonne of paddy straw burnt (ICAR figures, Govt. of Goa DIP): 1,460 kg CO₂, 60 kg CO, 3 kg PM, 5.5 kg N, 25 kg K₂O. Straw yield: 2.6 t/acre.
 
 The demo season is generated around today's date so the app always shows an active harvest. Export it with `npm run seed:export` (writes `data/demo-dataset.json` and `data/demo-fields.csv`).
 
-## Judge access
+> **Note:** headline results such as on-time % versus first-come booking come from the simulated Sangrur season, not from field trials.
 
-- **Live app**: *(add your Netlify link here)*
-- **Farmer side**: open `/farmer`. No login. Use "Try a demo number" on *Check my booking*.
-- **Officer side**: open `/admin`. Username `officer`, password `sangrur2026` (a "Fill demo login" button is on the login page).
+---
 
-## Architecture
+<a id="judge-access"></a>
+
+## 🧑‍⚖️ Judge access
+
+| | Where | Login |
+|---|---|---|
+| 🌐 Live app | *(add the Netlify link here)* | — |
+| 👨‍🌾 Farmer side | `/farmer` | None. Use **Try a demo number** on *Check my booking* |
+| 🏛️ Officer side | `/admin` | `officer` / `sangrur2026` (or tap **Fill demo login**) |
+
+---
+
+## 🏗️ Architecture
 
 ```
 Browser (React + Vite + Tailwind, Leaflet, Recharts)
@@ -77,7 +205,11 @@ Netlify Function  ──  Express app (server/app.js)
 Netlify Blobs (state JSON)   ·   local: server/data/local-state.json
 ```
 
-## Run locally
+---
+
+<a id="run-locally"></a>
+
+## 💻 Run locally
 
 ```bash
 npm install
@@ -85,18 +217,18 @@ npm run build
 npm start            # http://localhost:8787 (API + built frontend)
 ```
 
-For development with hot reload: `npm run dev` (API on 8787, Vite on 5173).
+Development with hot reload: `npm run dev` (API on 8787, Vite on 5173).
 
-Tests: `npm test` (11 engine tests: capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, optimiser beats baseline).
+Tests: `npm test` runs 11 engine tests covering capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, and optimiser vs baseline.
 
-## Deploy to Netlify
+## 🚀 Deploy to Netlify
 
-1. Push this folder to a GitHub repo.
-2. In Netlify: **Add new site → Import from Git**, pick the repo. Build command and publish folder are read from `netlify.toml`.
-3. In **Site configuration → Environment variables**, set `AUTH_SECRET` (any long random string) and optionally `FIRMS_MAP_KEY` and `ANTHROPIC_API_KEY`.
-4. Deploy. Netlify Blobs needs no extra setup.
+1. In Netlify: **Add new site → Import an existing project**, and pick this repo. Build settings are read from `netlify.toml`.
+2. In **Site configuration → Environment variables**, set `AUTH_SECRET` (any long random string). `FIRMS_MAP_KEY` and `ANTHROPIC_API_KEY` are optional.
+3. Deploy. Netlify Blobs needs no extra setup.
 
-## API (selection)
+<details>
+<summary><b>API reference</b></summary>
 
 | Method | Path | Auth |
 |---|---|---|
@@ -106,12 +238,19 @@ Tests: `npm test` (11 engine tests: capacity, harvest dates, tractor HP, rain bl
 | GET | `/api/farmer/lookup?phone=` | public |
 | POST | `/api/auth/login` | — |
 | GET | `/api/admin/overview`, `/alerts`, `/dispatch`, `/fields`, `/registry`, `/briefing`, `/log`, `/export/schedule.csv` | officer |
-| POST | `/api/admin/reassign`, `/whatif`, `/machines/:id`, `/fields/:id/status`, `/issues/:id/resolve`, `/reset` | officer |
+| POST | `/api/admin/reassign`, `/autofix`, `/autofix-all`, `/whatif`, `/machines/:id`, `/fields/:id/status`, `/issues/:id/resolve`, `/reset` | officer |
 
-## Research
+</details>
+
+---
+
+## 📚 Research
 
 - CEEW, *Why stubble burning continues in Punjab: perspectives from the ground*
 - CEEW, *Why Punjab farmers are averse to using Happy/Super Seeder machines*
 - The Tribune, *Satellites miss majority of stubble fires* (iFOREST report)
 
-Built with AI assistance (Claude).
+<div align="center">
+<br/>
+<sub>Built for the Cloud Counselage × DTI Social Impact Hackathon 2026 · Built with AI assistance (Claude)</sub>
+</div>
