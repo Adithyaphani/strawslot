@@ -14,7 +14,7 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Tests](https://img.shields.io/badge/tests-11%20passing-2F8F4E?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-React%20%7C%20Express%20%7C%20Netlify-14211B?style=flat-square)
 
-[**Live demo**](#judge-access) · [**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
+[**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
 
 <br/>
 
@@ -184,7 +184,6 @@ The demo season is generated around today's date so the app always shows an acti
 
 | | Where | Login |
 |---|---|---|
-| 🌐 Live app | *(add the Netlify link here)* | — |
 | 👨‍🌾 Farmer side | `/farmer` | None. Use **Try a demo number** on *Check my booking* |
 | 🏛️ Officer side | `/admin` | `officer` / `sangrur2026` (or tap **Fill demo login**) |
 
@@ -220,12 +219,6 @@ npm start            # http://localhost:8787 (API + built frontend)
 Development with hot reload: `npm run dev` (API on 8787, Vite on 5173).
 
 Tests: `npm test` runs 11 engine tests covering capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, and optimiser vs baseline.
-
-## 🚀 Deploy to Netlify
-
-1. In Netlify: **Add new site → Import an existing project**, and pick this repo. Build settings are read from `netlify.toml`.
-2. In **Site configuration → Environment variables**, set `AUTH_SECRET` (any long random string). `FIRMS_MAP_KEY` and `ANTHROPIC_API_KEY` are optional.
-3. Deploy. Netlify Blobs needs no extra setup.
 
 <details>
 <summary><b>API reference</b></summary>
