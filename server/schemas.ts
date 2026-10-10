@@ -26,7 +26,7 @@ export const IssueSchema = z.object({
   note: z.string().trim().max(300).optional().default(''),
 });
 
-export const LoginSchema = z.object({ user: z.string().default(''), password: z.string().default('') });
+export const LoginSchema = z.object({ user: z.string().trim().default(''), password: z.string().trim().default('') });
 export const ReassignSchema = z.object({ fieldId: z.string(), machineId: z.string(), fromDate: isoDate });
 export const FieldStatusSchema = z.object({ status: z.enum(['cleared', 'pending', 'burned']) });
 export const MachineStatusSchema = z.object({ status: z.enum(['active', 'maintenance']) });

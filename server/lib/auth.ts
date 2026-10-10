@@ -30,7 +30,7 @@ export function verify(token: string | null): AdminClaims | null {
 export function checkPassword(user: unknown, password: unknown): boolean {
   const c = credentials();
   const eq = (a: string, b: string) => a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
-  return eq(String(user), c.user) && eq(String(password), c.password);
+  return eq(String(user).trim().toLowerCase(), c.user.toLowerCase()) && eq(String(password), c.password);
 }
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
