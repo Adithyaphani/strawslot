@@ -49,7 +49,8 @@ export function runSchedule(state: State, opts: ScheduleOptions): Schedule {
 
   const chcById = Object.fromEntries(state.chcs.map((c) => [c.id, c]));
   const villageById = Object.fromEntries(state.villages.map((v) => [v.id, v]));
-  const pins = Object.fromEntries((state.pins || []).map((p) => [p.fieldId, p]));
+  // The baseline models plain first-come booking, so officer overrides never apply to it.
+  const pins = baseline ? {} : Object.fromEntries((state.pins || []).map((p) => [p.fieldId, p]));
 
   const machines = state.machines
     .filter((m) => m.status !== 'maintenance')
