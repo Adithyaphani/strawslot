@@ -334,7 +334,57 @@ export function createApp() {
     await saveState(state);
     const { sched } = await compute(state);
     const r0 = sched.results.find((x) => x.id === f.id);
-    res.json({ ok: true, result: fieldView(state, f, r0) });
+    const atRiskAfter = sched.results.filter((x) => x.status === 'at_risk').length;
+    res.json({ ok: true, result: fieldView(state, f, r0), atRiskAfter });
+  }));
+
+  // Try suggested machines for a field; keep the first that gets it in on time AND
+  // lowers the district's at-risk count (so a fix never just pushes other fields late).
+  function tryFix(state, opts, alert, actor, maxTries = 3) {
+    const others = (state.pins || []).filter((p) => p.fieldId !== alert.fieldId);
+    const before = runSchedule(state, opts).results.filter((x) => x.status === 'at_risk').length;
+    for (const s of alert.suggestions.filter((x) => x.kind === 'reassign').slice(0, maxTries)) {
+      const pin = { fieldId: alert.fieldId, machineId: s.machineId, fromDate: s.fromDate, by: actor, at: new Date().toISOString() };
+      const all = runSchedule({ ...state, pins: [...others, pin] }, opts).results;
+      const trial = all.find((x) => x.id === alert.fieldId);
+      const after = all.filter((x) => x.status === 'at_risk').length;
+      if (trial.status !== 'at_risk' && after < before) {
+        state.pins = [...others, pin];
+        const m = state.machines.find((x) => x.id === s.machineId);
+        logEvent(state, actor, 'reassign', `${alert.fieldId} → ${m?.label} (${m?.chcId}) from ${s.fromDate}, auto-fix`);
+        return { fixed: true, result: { start: trial.start, completion: trial.completion, status: trial.status }, atRiskAfter: after };
+      }
+    }
+    return { fixed: false };
+  }
+
+  a.post('/autofix', ah(async (req, res) => {
+    const { fieldId } = z.object({ fieldId: z.string() }).parse(req.body);
+    const state = await loadState();
+    const base = await compute(state);
+    const alert = buildAlerts(state, base.sched).find((x) => x.fieldId === fieldId);
+    if (!alert) return res.json({ ok: true, fixed: true, already: true });
+    const r0 = tryFix(state, base.opts, alert, req.admin.sub);
+    if (r0.fixed) await saveState(state);
+    res.json({ ok: true, ...r0 });
+  }));
+
+  // Sweep the most urgent alerts and apply every net-positive fix (bounded for serverless time limits).
+  a.post('/autofix-all', ah(async (req, res) => {
+    const state = await loadState();
+    const base = await compute(state);
+    const startedAt = Date.now();
+    const atRiskBefore = base.sched.results.filter((x) => x.status === 'at_risk').length;
+    const queue = buildAlerts(state, base.sched).slice(0, 25);
+    let fixed = 0, tried = 0;
+    for (const alert of queue) {
+      if (Date.now() - startedAt > 6500) break;
+      tried++;
+      if (tryFix(state, base.opts, alert, req.admin.sub, 2).fixed) fixed++;
+    }
+    if (fixed) await saveState(state);
+    const atRiskAfter = runSchedule(state, base.opts).results.filter((x) => x.status === 'at_risk').length;
+    res.json({ ok: true, fixed, tried, atRiskBefore, atRiskAfter });
   }));
 
   a.delete('/pins/:fieldId', ah(async (req, res) => {
@@ -414,19 +464,19 @@ export function createApp() {
     const facts = {
       date: sched.today, onTimePct: stats.onTimePct, pending: stats.fields.pending, atRisk: stats.fields.atRisk, highRisk: stats.fields.highRisk,
       utilisationPct: stats.utilisationPct, rainDays, firesDistrict7d: fires.districtCount, firesSource: fires.source,
-      worstBlock: worstBlock?.atRisk ? `${worstBlock.name} (${worstBlock.atRisk} at risk)` : null,
-      topAlert: alerts[0] ? `${alerts[0].fieldId} in ${alerts[0].village}, ${alerts[0].acres} ac, deadline ${fmtDate(alerts[0].deadline)} (${alerts[0].risk.reasons[0] || 'at risk'})` : null,
+      worstBlock: worstBlock?.atRisk ? { id: worstBlock.blockId, name: worstBlock.name, atRisk: worstBlock.atRisk } : null,
+      topAlert: alerts[0] ? { fieldId: alerts[0].fieldId, village: alerts[0].village, acres: alerts[0].acres, deadline: alerts[0].deadline, code: alerts[0].risk.codes[0] || null, reason: alerts[0].risk.reasons[0] || null } : null,
       pm25Sangrur: air.spots?.[0]?.pm25 ?? null,
       openIssues: (state.issues || []).filter((i) => i.status === 'open').length,
     };
     const ruleBased = [
       `${facts.onTimePct}% of ${facts.pending} pending fields are scheduled before their sowing deadline; ${facts.atRisk} are at risk (${facts.highRisk} high).`,
-      facts.worstBlock ? `Most pressure is in ${facts.worstBlock}. Consider moving a machine there.` : 'No block currently has fields at risk.',
+      facts.worstBlock ? `Most pressure is in ${facts.worstBlock.name} (${facts.worstBlock.atRisk} at risk). Consider moving a machine there.` : 'No block currently has fields at risk.',
       `Machine utilisation over the next 14 working days is ${facts.utilisationPct}%.`,
       facts.rainDays.length ? `Rain is forecast on ${facts.rainDays.map((d) => fmtDate(d)).join(', ')}; those days are blocked for field work.` : 'No rain stoppages in the forecast.',
       `${facts.firesDistrict7d} fire hotspots in the district over the last 7 days${facts.firesSource === 'sample' ? ' (sample data, add a FIRMS key for live)' : ''}.`,
       facts.openIssues ? `${facts.openIssues} farmer report(s) are waiting for a response.` : null,
-      facts.topAlert ? `Top priority: ${facts.topAlert}.` : null,
+      facts.topAlert ? `Top priority: ${facts.topAlert.fieldId} in ${facts.topAlert.village}, ${facts.topAlert.acres} ac, deadline ${fmtDate(facts.topAlert.deadline)}${facts.topAlert.reason ? ` (${facts.topAlert.reason.toLowerCase()})` : ''}.` : null,
     ].filter(Boolean);
 
     if (process.env.ANTHROPIC_API_KEY) {

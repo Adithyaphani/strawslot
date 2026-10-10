@@ -5,12 +5,14 @@ import FieldDrawer from './FieldDrawer.jsx';
 import { Button, Spinner, ErrorBox, useToast } from '../../components/ui.jsx';
 import { api, download } from '../../lib/api.js';
 import { useLoad } from '../../lib/useLoad.js';
-import { fmtDate, RISK } from '../../lib/format.js';
+import { fmtDate, fmtDay, RISK } from '../../lib/format.js';
+import { useAT } from '../../lib/adminI18n.jsx';
 
 const COL = 58;
 
 export default function Dispatch() {
   const toast = useToast();
+  const { t, locale } = useAT();
   const { data, error, loading, reload } = useLoad(() => api('/admin/dispatch', { auth: true }));
   const [chc, setChc] = useState('all');
   const [drawer, setDrawer] = useState(null);
@@ -22,7 +24,7 @@ export default function Dispatch() {
       .map((c) => ({ ...c, machines: data.machines.filter((m) => m.chcId === c.id) }));
   }, [data, chc]);
 
-  if (loading && !data) return <Spinner label="Building the dispatch board" />;
+  if (loading && !data) return <Spinner label={t('building')} />;
   if (error) return <ErrorBox error={error} onRetry={reload} />;
 
   const days = data.days;
@@ -30,20 +32,20 @@ export default function Dispatch() {
     const status = m.status === 'maintenance' ? 'active' : 'maintenance';
     try {
       await api(`/admin/machines/${m.id}`, { method: 'POST', auth: true, body: { status } });
-      toast(status === 'maintenance' ? `${m.label} taken off the road, jobs reshuffled` : `${m.label} back in service`);
+      toast(status === 'maintenance' ? t('toast_maint', { m: m.label }) : t('toast_active', { m: m.label }));
       reload();
     } catch (e) { toast(e.message, 'err'); }
   };
 
   return (
     <div>
-      <PageHead title="Dispatch board" sub="Each row is a machine, each column a day. Gold cells are booked work; the fuller the cell, the more of that day's capacity is used. Blue days are blocked by rain.">
-        <select className="input h-10 w-56 py-0 text-sm" value={chc} onChange={(e) => setChc(e.target.value)} aria-label="Filter by hiring centre">
-          <option value="all">All hiring centres</option>
-          {data.chcs.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+      <PageHead title={t('dp_title')} sub={t('dp_sub')}>
+        <select className="input h-10 w-56 py-0 text-sm" value={chc} onChange={(e) => setChc(e.target.value)} aria-label={t('all_centres')}>
+          <option value="all">{t('all_centres')}</option>
+          {data.chcs.map((c) => <option key={c.id} value={c.id}>{c.name.replace(' Custom Hiring Centre', '')}</option>)}
         </select>
-        <Button variant="outline" icon={Download} onClick={() => download('/admin/export/schedule.csv', `strawslot-schedule-${data.today}.csv`)}>CSV</Button>
-        <Button variant="dark" icon={Play} loading={loading} onClick={reload}>Re-run optimiser</Button>
+        <Button variant="outline" icon={Download} onClick={() => download('/admin/export/schedule.csv', `strawslot-schedule-${data.today}.csv`)}>{t('csv')}</Button>
+        <Button variant="dark" icon={Play} loading={loading} onClick={reload}>{t('rerun')}</Button>
       </PageHead>
 
       <div className="panel overflow-hidden">
@@ -51,11 +53,11 @@ export default function Dispatch() {
           <div style={{ minWidth: 240 + days.length * COL }}>
             {/* day header */}
             <div className="sticky top-0 z-10 flex border-b border-line bg-white">
-              <div className="sticky left-0 z-20 w-[240px] shrink-0 border-r border-line bg-white px-4 py-2 text-xs font-semibold text-ink-mute">Machine</div>
+              <div className="sticky left-0 z-20 w-[240px] shrink-0 border-r border-line bg-white px-4 py-2 text-xs font-semibold text-ink-mute">{t('machine')}</div>
               {days.map((d) => (
                 <div key={d.date} style={{ width: COL }} className={`shrink-0 border-r border-line/60 py-2 text-center text-[11px] ${d.date === data.today ? 'bg-stubble-50 font-bold text-ink' : 'text-ink-mute'} ${!d.working ? 'bg-sky-50 text-sky-600' : ''}`}>
-                  <p>{fmtDate(d.date, { weekday: 'short' })}</p>
-                  <p className="num font-semibold">{fmtDate(d.date, { day: 'numeric' })}</p>
+                  <p>{fmtDay(d.date, locale).split(',')[0]}</p>
+                  <p className="num font-semibold">{d.date.slice(8, 10).replace(/^0/, '')}</p>
                   {!d.working && <CloudRain className="mx-auto mt-0.5 h-3 w-3" />}
                 </div>
               ))}
@@ -65,7 +67,7 @@ export default function Dispatch() {
               <div key={g.id}>
                 <div className="sticky left-0 flex items-center gap-3 border-b border-line bg-ground px-4 py-2 text-xs">
                   <span className="font-bold text-ink">{g.name}</span>
-                  <span className="text-ink-mute">{g.tractors.length} tractor{g.tractors.length === 1 ? '' : 's'} ({g.tractors.map((t) => `${t.hp} HP`).join(', ')})</span>
+                  <span className="text-ink-mute">{t('tractors_n', { n: g.tractors.length, hp: g.tractors.map((x) => `${x.hp} HP`).join(', ') })}</span>
                 </div>
                 {g.machines.map((m) => {
                   const byDate = {};
@@ -75,11 +77,11 @@ export default function Dispatch() {
                     <div key={m.id} className="flex border-b border-line/70">
                       <div className="sticky left-0 z-[5] flex w-[240px] shrink-0 items-center justify-between gap-2 border-r border-line bg-white px-4 py-2">
                         <div className="min-w-0">
-                          <p className={`truncate text-sm font-semibold ${maint ? 'text-ink-mute line-through' : ''}`}>{m.label}</p>
-                          <p className="text-[11px] text-ink-mute">{m.acresPerDay} ac/day · needs {m.minHp} HP</p>
+                          <p className={`truncate text-sm font-semibold ${maint ? 'text-ink-mute line-through' : ''}`}>{t(`mt_${m.type}`)} #{m.label.split('#')[1]}</p>
+                          <p className="text-[11px] text-ink-mute">{t('per_day', { a: m.acresPerDay, h: m.minHp })}</p>
                         </div>
-                        <button onClick={() => toggleMaint(m)} title={maint ? 'Return to service' : 'Mark under maintenance'}
-                          className={`shrink-0 rounded-ctl p-1.5 ${maint ? 'bg-fire-50 text-fire-600' : 'text-ink-mute hover:bg-smoke-100'}`} aria-label={maint ? `Return ${m.label} to service` : `Mark ${m.label} under maintenance`}>
+                        <button onClick={() => toggleMaint(m)} title={maint ? t('maint_off') : t('maint_on')}
+                          className={`shrink-0 rounded-ctl p-1.5 ${maint ? 'bg-fire-50 text-fire-600' : 'text-ink-mute hover:bg-smoke-100'}`} aria-label={`${maint ? t('maint_off') : t('maint_on')}: ${m.label}`}>
                           <Wrench className="h-4 w-4" />
                         </button>
                       </div>
@@ -98,7 +100,7 @@ export default function Dispatch() {
                                   {j.fieldId.slice(2)} <span className="font-normal opacity-90">{j.acres}</span>
                                 </button>
                               ))}
-                              {jobs.length > 2 && <span className="px-1 text-[10px] font-semibold text-ink-soft">+{jobs.length - 2} more</span>}
+                              {jobs.length > 2 && <span className="px-1 text-[10px] font-semibold text-ink-soft">{t('more_n', { n: jobs.length - 2 })}</span>}
                             </div>
                           </div>
                         );
@@ -112,10 +114,10 @@ export default function Dispatch() {
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-4 text-xs text-ink-mute">
-        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-[#B88A22]" />Booked, on time (field id, acres)</span>
-        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-fire-500" />Late or high-risk field</span>
-        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-stubble-100" />Share of daily capacity used</span>
-        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-sky-50" />Rain, no field work</span>
+        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-[#B88A22]" />{t('lg_booked')}</span>
+        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-fire-500" />{t('lg_late')}</span>
+        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-stubble-100" />{t('lg_share')}</span>
+        <span className="flex items-center gap-1.5"><span className="h-3 w-5 rounded-sm bg-sky-50" />{t('lg_rain')}</span>
       </div>
       <FieldDrawer fieldId={drawer} onClose={() => setDrawer(null)} onChanged={reload} />
     </div>

@@ -19,7 +19,7 @@ Small farmers burn paddy straw because no one schedules machines, tractors and p
 | | Farmer side (no login) | Officer side (login) |
 |---|---|---|
 | Who | Small and marginal paddy farmers | District / block crop-residue nodal officers |
-| Language | Punjabi, Hindi, English | English |
+| Language | Punjabi, Hindi, English | English, Punjabi |
 | Key screens | Book a machine (3-step wizard), check my booking, straw value calculator | District overview, early warnings, dispatch board, fields, what-if planner, machines & centres, activity log |
 
 **Core engine**
@@ -34,7 +34,10 @@ Small farmers burn paddy straw because no one schedules machines, tractors and p
 
 - Farmer SMS text in Punjabi / Hindi / English with WhatsApp share
 - Farmer "report a problem" flows straight into the officer's queue
-- Officer AI briefing (Claude API if a key is set, rule-based otherwise)
+- Officer AI briefing (Claude API if a key is set, rule-based otherwise), shown in English or Punjabi
+- One-click **Auto-fix** per field and **Auto-fix district** sweep: only applies a reassignment if it gets the field in on time *and* lowers the district's total at-risk count
+- Live booking preview for farmers: sowing window, days left and which machines their tractor can pull
+- Illustrated, responsive farmer and landing pages; bilingual officer console (risk reasons, fixes and briefing are localised too)
 - What-if planner: add machines, repair idle ones or rent tractors, and see the change in on-time %
 - Officer overrides (pin a field to a machine), machine maintenance toggle, CSV export
 - Live weather, PM2.5 (Sangrur vs Delhi) and NASA FIRMS fire hotspots

@@ -3,8 +3,22 @@ import { Home, CalendarPlus, Ticket, Calculator } from 'lucide-react';
 import { Logo } from '../../components/ui.jsx';
 import { useI18n, LANGS } from '../../lib/i18n.jsx';
 
+export function LangSwitch({ dark = false }) {
+  const { lang, setLang } = useI18n();
+  return (
+    <div className={`flex rounded-full p-1 ${dark ? 'bg-white/10' : 'border border-line bg-white'}`} role="radiogroup" aria-label="Language">
+      {LANGS.map((l) => (
+        <button key={l.code} role="radio" aria-checked={lang === l.code} onClick={() => setLang(l.code)}
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${lang === l.code ? 'bg-sprout-600 text-white shadow-sm' : dark ? 'text-white/80 hover:text-white' : 'text-ink-soft hover:text-ink'}`}>
+          {l.name}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function FarmerLayout() {
-  const { lang, setLang, t } = useI18n();
+  const { t } = useI18n();
   const nav = [
     ['/farmer', Home, t('home'), true],
     ['/farmer/register', CalendarPlus, t('register')],
@@ -12,29 +26,32 @@ export default function FarmerLayout() {
     ['/farmer/calculator', Calculator, t('calc')],
   ];
   return (
-    <div className="min-h-screen pb-24">
-      <header className="sticky top-0 z-40 border-b border-line bg-ground/90 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-2 px-4 py-3">
+    <div className="flex min-h-screen flex-col pb-24 lg:pb-0">
+      <header className="sticky top-0 z-40 border-b border-line/80 bg-ground/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/farmer" aria-label="StrawSlot farmer home"><Logo /></Link>
-          <div className="flex rounded-ctl border border-line bg-white p-0.5" role="radiogroup" aria-label="Language">
-            {LANGS.map((l) => (
-              <button key={l.code} role="radio" aria-checked={lang === l.code} onClick={() => setLang(l.code)}
-                className={`rounded-[6px] px-2.5 py-1.5 text-sm font-semibold ${lang === l.code ? 'bg-sprout-600 text-white' : 'text-ink-soft'}`}>
-                {l.name}
-              </button>
+          <nav className="hidden items-center gap-1 lg:flex">
+            {nav.map(([to, Icon, label, end]) => (
+              <NavLink key={to} to={to} end={end} className={({ isActive }) => `flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${isActive ? 'bg-sprout-900 text-white' : 'text-ink-soft hover:bg-white'}`}>
+                <Icon className="h-4 w-4" />{label}
+              </NavLink>
             ))}
-          </div>
+          </nav>
+          <LangSwitch />
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 pt-5">
-        <Outlet />
-        <p className="mt-10 text-center text-xs text-ink-mute">
-          {t('simulated')} · <Link to="/admin" className="underline">{t('officerLogin')}</Link>
-        </p>
-      </main>
+      <div className="flex-1"><Outlet /></div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 backdrop-blur">
+      <footer className="mt-16 border-t border-line bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-sm text-ink-mute sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <Logo />
+          <p>{t('simulated')}</p>
+          <Link to="/admin" className="font-semibold text-ink underline">{t('officerLogin')}</Link>
+        </div>
+      </footer>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 backdrop-blur lg:hidden">
         <div className="mx-auto grid max-w-2xl grid-cols-4">
           {nav.map(([to, Icon, label, end]) => (
             <NavLink key={to} to={to} end={end}
@@ -49,4 +66,8 @@ export default function FarmerLayout() {
       </nav>
     </div>
   );
+}
+
+export function PageWrap({ children, wide = false }) {
+  return <main className={`mx-auto px-4 pt-6 sm:px-6 lg:px-8 lg:pt-10 ${wide ? 'max-w-7xl' : 'max-w-6xl'}`}>{children}</main>;
 }

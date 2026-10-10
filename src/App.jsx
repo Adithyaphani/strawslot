@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n.jsx';
+import { AdminI18nProvider } from './lib/adminI18n.jsx';
 import { ToastProvider, Spinner } from './components/ui.jsx';
 import { session } from './lib/api.js';
 
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <ToastProvider>
       <I18nProvider>
+      <AdminI18nProvider>
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -54,6 +56,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+      </AdminI18nProvider>
       </I18nProvider>
     </ToastProvider>
   );

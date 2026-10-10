@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { MapPin, Check, Loader2, Sprout, Package, Shuffle } from 'lucide-react';
 import { Button, ErrorBox } from '../../components/ui.jsx';
 import SlotCard from './SlotCard.jsx';
+import { PageWrap } from './FarmerLayout.jsx';
+import SeasonStrip from '../../components/SeasonStrip.jsx';
+import { CalendarClock, Tractor as TractorIcon } from 'lucide-react';
 import { useI18n, LANGS } from '../../lib/i18n.jsx';
 import { api } from '../../lib/api.js';
-import { todayIST } from '../../lib/format.js';
+import { todayIST, addDays, fmtDay } from '../../lib/format.js';
 
 const init = (lang) => ({
   farmerName: '', phone: '', language: lang, villageId: '', acres: '', harvestDate: todayIST(), windowDays: 16,
@@ -76,19 +79,24 @@ export default function Register() {
 
   if (slot) {
     return (
-      <div className="space-y-4">
+      <PageWrap>
+      <div className="mx-auto max-w-3xl space-y-4">
         <SlotCard slot={slot} />
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={() => { setSlot(null); setStep(0); setF(init(lang)); }}>{t('bookAnother')}</Button>
           <Link to="/farmer" className="inline-flex h-10 flex-1 items-center justify-center rounded-ctl bg-ink text-sm font-semibold text-white">{t('home')}</Link>
         </div>
       </div>
+      </PageWrap>
     );
   }
 
   return (
+    <PageWrap>
+    <div className="grid items-start gap-6 lg:grid-cols-[1fr_400px] lg:gap-10">
     <div>
-      <h1 className="text-[28px] font-extrabold">{t('register')}</h1>
+      <h1 className="text-[32px] font-extrabold sm:text-[40px]">{t('register')}</h1>
+      <p className="mt-1 text-ink-soft">{t('registerSub')}</p>
       <ol className="mt-4 flex gap-2" aria-label="Progress">
         {steps.map((s, i) => (
           <li key={s} className="flex-1">
@@ -98,7 +106,7 @@ export default function Register() {
         ))}
       </ol>
 
-      <div className="panel mt-5 space-y-5 p-5">
+      <div className="panel mt-5 space-y-6 p-5 sm:p-7">
         {step === 0 && (<>
           <Field label={t('name')} error={errors.farmerName}>
             <input className="input" value={f.farmerName} onChange={(e) => set('farmerName', e.target.value)} placeholder={t('namePh')} autoComplete="name" />
@@ -183,6 +191,57 @@ export default function Register() {
         </div>
       </div>
     </div>
+    <Preview f={f} meta={meta} />
+    </div>
+    </PageWrap>
+  );
+}
+
+// Live preview so the farmer sees their sowing window and machine options while typing.
+function Preview({ f, meta }) {
+  const { t, locale } = useI18n();
+  const today = todayIST();
+  const ok = /^\d{4}-\d{2}-\d{2}$/.test(f.harvestDate || '');
+  const deadline = ok ? addDays(f.harvestDate, Number(f.windowDays) || 16) : null;
+  const types = meta ? Object.entries(meta.machineTypes) : [];
+  const forPref = types.filter(([, m]) => f.preference === 'any' || m.method === f.preference);
+  const pullable = f.tractor.owns ? forPref.filter(([, m]) => Number(f.tractor.hp) >= m.minHp) : [];
+  const machineName = { super_seeder: { en: 'Super Seeder', hi: 'सुपर सीडर', pa: 'ਸੁਪਰ ਸੀਡਰ' }, happy_seeder: { en: 'Happy Seeder', hi: 'हैप्पी सीडर', pa: 'ਹੈਪੀ ਸੀਡਰ' }, mulcher: { en: 'Mulcher', hi: 'मल्चर', pa: 'ਮਲਚਰ' }, baler: { en: 'Baler', hi: 'बेलर', pa: 'ਬੇਲਰ' } };
+  const lang = locale.slice(0, 2);
+  const daysLeft = deadline ? Math.max(0, Math.round((Date.parse(deadline) - Date.parse(today)) / 864e5)) : null;
+  return (
+    <aside className="lg:sticky lg:top-24">
+      <div className="overflow-hidden rounded-[20px] bg-sprout-900 text-white shadow-pop">
+        <div className="px-6 pt-6">
+          <p className="flex items-center gap-2 text-sm font-semibold text-stubble-300"><CalendarClock className="h-4 w-4" />{t('previewTitle')}</p>
+          {deadline ? (
+            <>
+              <p className="mt-3 font-display text-[56px] font-extrabold leading-none">{daysLeft}</p>
+              <p className="text-sm text-sprout-100">{t('daysToSow')}</p>
+            </>
+          ) : <p className="mt-3 text-sprout-100">{t('previewEmpty')}</p>}
+        </div>
+        {deadline && (
+          <div className="mx-4 mt-4 rounded-2xl bg-white px-4 text-ink">
+            <SeasonStrip harvestDate={f.harvestDate} deadline={deadline} today={today} locale={locale} labels={{ harvest: t('harvested'), today: t('today'), deadline: t('deadline') }} />
+          </div>
+        )}
+        <div className="space-y-3 px-6 py-5 text-sm">
+          {deadline && <p className="flex justify-between"><span className="text-sprout-200">{t('deadline')}</span><b>{fmtDay(deadline, locale)}</b></p>}
+          {f.acres && <p className="flex justify-between"><span className="text-sprout-200">{t('acres')}</span><b>{f.acres}</b></p>}
+          <div className="border-t border-white/10 pt-3">
+            <p className="flex items-center gap-2 font-semibold"><TractorIcon className="h-4 w-4 text-stubble-300" />
+              {f.tractor.owns ? `${t('canPull')} (${f.tractor.hp} HP)` : t('noTractorNote')}
+            </p>
+            {f.tractor.owns && (
+              pullable.length ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">{pullable.map(([k]) => <span key={k} className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold">{machineName[k][lang] || machineName[k].en}</span>)}</div>
+              ) : <p className="mt-1 text-sprout-100">{f.tractor.hp} HP {t('smallTractorNote')}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </aside>
   );
 }
 

@@ -229,6 +229,71 @@ const D = {
   },
 };
 
+// Strings added for the redesigned farmer pages.
+Object.assign(D.en, {
+  kicker: 'Paddy harvest season, Sangrur',
+  stepsTitle: 'How it works for you',
+  s1: 'Tell us your harvest date', s1d: 'Village, acres and whether you have a tractor. One minute.',
+  s2: 'We book the machine', s2d: 'A seeder or baler, a tractor if you need one, and straw pickup, all before your sowing date.',
+  s3: 'You get an SMS', s3d: 'Date, machine and the centre’s phone number, in your language.',
+  s4: 'Sow wheat on time', s4d: 'Straw goes into the soil or is sold as bales. No fire, no fine.',
+  centresTitle: 'Hiring centres in the district',
+  centresSub: 'Machines and tractors for rent. Call if you have questions.',
+  previewTitle: 'Your field at a glance',
+  previewEmpty: 'Enter your harvest date to see your sowing window.',
+  daysToSow: 'days to clear straw and sow',
+  canPull: 'Your tractor can pull',
+  noTractorNote: 'No tractor? We pair the machine with a hiring centre tractor.',
+  smallTractorNote: 'is too small for seeders. We will bring a centre tractor.',
+  safeWindow: 'Safe window',
+  bookCta: 'Book now, it is free',
+  free: 'Free for farmers',
+  noLogin: 'No app or login needed',
+  inYourLang: 'Punjabi, Hindi or English',
+});
+Object.assign(D.hi, {
+  kicker: 'धान कटाई का मौसम, संगरूर',
+  stepsTitle: 'यह आपके लिए कैसे काम करता है',
+  s1: 'कटाई की तारीख बताएं', s1d: 'गांव, एकड़ और क्या आपके पास ट्रैक्टर है। एक मिनट।',
+  s2: 'हम मशीन बुक करते हैं', s2d: 'सीडर या बेलर, जरूरत हो तो ट्रैक्टर, और पराली उठान, सब बुवाई की तारीख से पहले।',
+  s3: 'आपको SMS मिलता है', s3d: 'तारीख, मशीन और केंद्र का फोन नंबर, आपकी भाषा में।',
+  s4: 'समय पर गेहूं बोएं', s4d: 'पराली मिट्टी में मिलती है या गांठों में बिकती है। न आग, न जुर्माना।',
+  centresTitle: 'जिले के कस्टम हायरिंग केंद्र',
+  centresSub: 'किराये पर मशीनें और ट्रैक्टर। सवाल हो तो कॉल करें।',
+  previewTitle: 'आपका खेत एक नज़र में',
+  previewEmpty: 'बुवाई का समय देखने के लिए कटाई की तारीख डालें।',
+  daysToSow: 'दिन पराली साफ करने और बुवाई के लिए',
+  canPull: 'आपका ट्रैक्टर खींच सकता है',
+  noTractorNote: 'ट्रैक्टर नहीं है? हम केंद्र का ट्रैक्टर साथ भेजेंगे।',
+  smallTractorNote: 'सीडर के लिए छोटा है। हम केंद्र का ट्रैक्टर लाएंगे।',
+  safeWindow: 'सुरक्षित समय',
+  bookCta: 'अभी बुक करें, मुफ्त है',
+  free: 'किसानों के लिए मुफ्त',
+  noLogin: 'कोई ऐप या लॉगिन नहीं',
+  inYourLang: 'पंजाबी, हिंदी या अंग्रेज़ी',
+});
+Object.assign(D.pa, {
+  kicker: 'ਝੋਨੇ ਦੀ ਕਟਾਈ ਦਾ ਮੌਸਮ, ਸੰਗਰੂਰ',
+  stepsTitle: 'ਇਹ ਤੁਹਾਡੇ ਲਈ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ',
+  s1: 'ਕਟਾਈ ਦੀ ਤਰੀਕ ਦੱਸੋ', s1d: 'ਪਿੰਡ, ਏਕੜ ਅਤੇ ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਟਰੈਕਟਰ ਹੈ। ਇੱਕ ਮਿੰਟ।',
+  s2: 'ਅਸੀਂ ਮਸ਼ੀਨ ਬੁੱਕ ਕਰਦੇ ਹਾਂ', s2d: 'ਸੀਡਰ ਜਾਂ ਬੇਲਰ, ਲੋੜ ਹੋਵੇ ਤਾਂ ਟਰੈਕਟਰ, ਅਤੇ ਪਰਾਲੀ ਚੁਕਾਈ, ਸਭ ਬਿਜਾਈ ਦੀ ਤਰੀਕ ਤੋਂ ਪਹਿਲਾਂ।',
+  s3: 'ਤੁਹਾਨੂੰ SMS ਮਿਲਦਾ ਹੈ', s3d: 'ਤਰੀਕ, ਮਸ਼ੀਨ ਅਤੇ ਕੇਂਦਰ ਦਾ ਫ਼ੋਨ ਨੰਬਰ, ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ।',
+  s4: 'ਸਮੇਂ ਸਿਰ ਕਣਕ ਬੀਜੋ', s4d: 'ਪਰਾਲੀ ਮਿੱਟੀ ਵਿੱਚ ਮਿਲਦੀ ਹੈ ਜਾਂ ਗੰਢਾਂ ਵਿੱਚ ਵਿਕਦੀ ਹੈ। ਨਾ ਅੱਗ, ਨਾ ਜੁਰਮਾਨਾ।',
+  centresTitle: 'ਜ਼ਿਲ੍ਹੇ ਦੇ ਕਸਟਮ ਹਾਇਰਿੰਗ ਕੇਂਦਰ',
+  centresSub: 'ਕਿਰਾਏ ਤੇ ਮਸ਼ੀਨਾਂ ਅਤੇ ਟਰੈਕਟਰ। ਸਵਾਲ ਹੋਵੇ ਤਾਂ ਕਾਲ ਕਰੋ।',
+  previewTitle: 'ਤੁਹਾਡਾ ਖੇਤ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ',
+  previewEmpty: 'ਬਿਜਾਈ ਦਾ ਸਮਾਂ ਦੇਖਣ ਲਈ ਕਟਾਈ ਦੀ ਤਰੀਕ ਪਾਓ।',
+  daysToSow: 'ਦਿਨ ਪਰਾਲੀ ਸਾਫ਼ ਕਰਨ ਅਤੇ ਬਿਜਾਈ ਲਈ',
+  canPull: 'ਤੁਹਾਡਾ ਟਰੈਕਟਰ ਖਿੱਚ ਸਕਦਾ ਹੈ',
+  noTractorNote: 'ਟਰੈਕਟਰ ਨਹੀਂ? ਅਸੀਂ ਕੇਂਦਰ ਦਾ ਟਰੈਕਟਰ ਨਾਲ ਭੇਜਾਂਗੇ।',
+  smallTractorNote: 'ਸੀਡਰ ਲਈ ਛੋਟਾ ਹੈ। ਅਸੀਂ ਕੇਂਦਰ ਦਾ ਟਰੈਕਟਰ ਲਿਆਵਾਂਗੇ।',
+  safeWindow: 'ਸੁਰੱਖਿਅਤ ਸਮਾਂ',
+  bookCta: 'ਹੁਣੇ ਬੁੱਕ ਕਰੋ, ਮੁਫ਼ਤ ਹੈ',
+  free: 'ਕਿਸਾਨਾਂ ਲਈ ਮੁਫ਼ਤ',
+  noLogin: 'ਕੋਈ ਐਪ ਜਾਂ ਲਾਗਇਨ ਨਹੀਂ',
+  inYourLang: 'ਪੰਜਾਬੀ, ਹਿੰਦੀ ਜਾਂ ਅੰਗਰੇਜ਼ੀ',
+});
+
 export const LOCALES = { en: 'en-IN', hi: 'hi-IN', pa: 'pa-IN' };
 const Ctx = createContext(null);
 

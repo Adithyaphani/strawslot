@@ -101,7 +101,7 @@ export function runSchedule(state, opts) {
         const daysLeft = diffDays(w.deadline, d);
         let slack = daysLeft - w.remaining / 7;
         if (w.assignments.length) slack -= 0.5; // finish what we started
-        if (pins[w.f.id]) slack -= 100; // officer overrides go first
+        if (pins[w.f.id]) slack -= 1.5; // officer overrides get a nudge, without starving other fields
         return { w, slack };
       })
       .sort((a, b) => a.slack - b.slack);
@@ -182,7 +182,7 @@ export function runSchedule(state, opts) {
       blockId: villageById[f.villageId]?.blockId,
     };
     if (f.status !== 'pending') {
-      return { ...base, status: f.status, onTime: f.status === 'cleared', risk: { score: 0, level: 'low', reasons: [] }, assignments: [], pickups: [] };
+      return { ...base, status: f.status, onTime: f.status === 'cleared', risk: { score: 0, level: 'low', reasons: [], codes: [] }, assignments: [], pickups: [] };
     }
     const done = w.remaining <= 0.01;
     const completion = done ? w.assignments[w.assignments.length - 1].date : null;
@@ -193,20 +193,23 @@ export function runSchedule(state, opts) {
 
     // Burn-risk score
     const slackDays = done ? diffDays(w.deadline, completion) : -3;
+    // reasons: English text for logs/CSV, codes for the bilingual UI
     const reasons = [];
+    const codes = [];
+    const why = (text, code) => { reasons.push(text); codes.push(code); };
     const sSlack = clamp(45 - slackDays * 7.5, 0, 60);
-    if (!done) reasons.push('No machine available before the deadline');
-    else if (slackDays < 0) reasons.push(`Projected ${-slackDays} day(s) after sowing deadline`);
-    else if (slackDays <= 2) reasons.push(`Only ${slackDays} day(s) of buffer`);
+    if (!done) why('No machine available before the deadline', { k: 'no_machine' });
+    else if (slackDays < 0) why(`Projected ${-slackDays} day(s) after sowing deadline`, { k: 'late', n: -slackDays });
+    else if (slackDays <= 2) why(`Only ${slackDays} day(s) of buffer`, { k: 'buffer', n: slackDays });
     const sTractor = !f.tractor?.owns ? 10 : f.tractor.hp < 45 ? 5 : 0;
-    if (sTractor === 10) reasons.push('Farmer has no tractor, needs a CHC tractor');
-    else if (sTractor === 5) reasons.push(`Own tractor (${f.tractor.hp} HP) too small for seeders`);
+    if (sTractor === 10) why('Farmer has no tractor, needs a CHC tractor', { k: 'no_tractor' });
+    else if (sTractor === 5) why(`Own tractor (${f.tractor.hp} HP) too small for seeders`, { k: 'small_tractor', n: f.tractor.hp });
     const km = w.nearestChc?.km ?? 0;
     const sDist = clamp(km * 0.5, 0, 10);
-    if (km > 12) reasons.push(`Nearest CHC is ${km} km away`);
+    if (km > 12) why(`Nearest CHC is ${km} km away`, { k: 'far', n: km });
     const nearFires = firesRecent.filter((p) => haversineKm(p, f) <= 5).length;
     const sFire = clamp(nearFires * 5, 0, 15);
-    if (nearFires) reasons.push(`${nearFires} fire hotspot(s) within 5 km this week`);
+    if (nearFires) why(`${nearFires} fire hotspot(s) within 5 km this week`, { k: 'fires', n: nearFires });
     const score = Math.round(clamp(sSlack + sTractor + sDist + sFire, 0, 100));
 
     let status = 'scheduled';
@@ -224,7 +227,7 @@ export function runSchedule(state, opts) {
       assignments: w.assignments,
       pickups,
       method: w.assignments.length ? MACHINE_TYPES[w.assignments[0].type].method : null,
-      risk: { score, level: riskLevel(score), reasons, parts: { slack: Math.round(sSlack), tractor: sTractor, distance: Math.round(sDist), fires: sFire } },
+      risk: { score, level: riskLevel(score), reasons, codes, parts: { slack: Math.round(sSlack), tractor: sTractor, distance: Math.round(sDist), fires: sFire } },
     };
   });
 
@@ -259,6 +262,10 @@ export function buildAlerts(state, sched) {
       candidates.forEach((x) => suggestions.push({
         kind: 'reassign',
         machineId: x.m.id,
+        machineType: x.m.type,
+        machineNo: x.m.label.split('#')[1] || '',
+        chcId: x.c.id,
+        km: x.km,
         fromDate: x.free[0],
         text: `Assign ${x.m.label} from ${x.c.name} (${x.km} km), free from ${niceDate(x.free[0])}`,
       }));

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Wheat, IndianRupee, Leaf, Wind } from 'lucide-react';
 import { useI18n } from '../../lib/i18n.jsx';
 import { fmtNum } from '../../lib/format.js';
+import { PageWrap } from './FarmerLayout.jsx';
 
 // Factors match the server (see Methodology page).
 const STRAW_T_PER_ACRE = 2.6;
@@ -16,9 +17,10 @@ export default function StrawCalc() {
   const income = tonnes * 10 * price;
 
   return (
-    <div>
-      <h1 className="text-[28px] font-extrabold">{t('calcTitle')}</h1>
-      <div className="panel mt-5 space-y-5 p-5">
+    <PageWrap>
+      <h1 className="text-[32px] font-extrabold sm:text-[40px]">{t('calcTitle')}</h1>
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[400px_1fr]">
+      <div className="panel space-y-6 p-6">
         <div>
           <label className="label" htmlFor="acres">{t('calcAcres')}</label>
           <div className="flex items-center gap-3">
@@ -33,22 +35,24 @@ export default function StrawCalc() {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Out icon={Wheat} label={t('calcStraw')} value={`${fmtNum(tonnes, 1)} ${t('tonnes')}`} />
         <Out icon={IndianRupee} label={t('calcIncome')} value={`₹${fmtNum(income)}`} gold />
         <Out icon={Leaf} label={t('calcSaved')} value={`N ${fmtNum(tonnes * NUTR.n)} · K₂O ${fmtNum(tonnes * NUTR.k)} · P₂O₅ ${fmtNum(tonnes * NUTR.p)} ${t('kg')}`} />
         <Out icon={Wind} label={t('calcSmoke')} value={`CO₂ ${fmtNum(tonnes * PER_T.co2 / 1000, 1)} ${t('tonnes')} · PM ${fmtNum(tonnes * PER_T.pm)} ${t('kg')}`} />
       </div>
-      <p className="mt-3 text-xs text-ink-mute">2.6 t straw/acre; per tonne burnt: 1,460 kg CO₂, 3 kg particulate matter, 5.5 kg N, 25 kg K₂O (ICAR figures via Govt. of Goa DIP).</p>
-    </div>
+      </div>
+      <p className="mt-4 text-xs text-ink-mute">2.6 t straw/acre; per tonne burnt: 1,460 kg CO₂, 3 kg particulate matter, 5.5 kg N, 25 kg K₂O (ICAR figures via Govt. of Goa DIP).</p>
+    </PageWrap>
   );
 }
 
 function Out({ icon: Icon, label, value, gold }) {
   return (
-    <div className={`rounded-panel border p-4 ${gold ? 'border-stubble-300 bg-stubble-50' : 'border-line bg-white'}`}>
-      <p className="flex items-center gap-2 text-sm text-ink-soft"><Icon className="h-4 w-4" />{label}</p>
-      <p className="num mt-1 font-display text-xl font-bold">{value}</p>
+    <div className={`rounded-[18px] border p-5 ${gold ? 'border-stubble-300 bg-stubble-50' : 'border-line bg-white shadow-panel'}`}>
+      <span className={`grid h-10 w-10 place-items-center rounded-xl ${gold ? 'bg-stubble-500 text-ink' : 'bg-sprout-50 text-sprout-700'}`}><Icon className="h-5 w-5" /></span>
+      <p className="mt-3 text-sm text-ink-soft">{label}</p>
+      <p className={`num mt-1 font-display font-extrabold ${gold ? 'text-[34px]' : 'text-xl'}`}>{value}</p>
     </div>
   );
 }

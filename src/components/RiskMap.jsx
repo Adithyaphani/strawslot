@@ -16,7 +16,9 @@ function colorFor(f) {
   return RISK[f.level]?.color || '#2F8F4E';
 }
 
-export default function RiskMap({ fields = [], chcs = [], fires = [], centre, onSelect, height = 460 }) {
+const DEFAULT_T = (k) => ({ layer_pending: 'Pending fields', layer_cleared: 'Cleared fields', layer_chcs: 'Hiring centres', layer_fires: 'Fire hotspots', risk_high: 'High risk', risk_medium: 'Watch', risk_low: 'On track' }[k] || k);
+
+export default function RiskMap({ fields = [], chcs = [], fires = [], centre, onSelect, height = 460, t = DEFAULT_T, statusLabel = (s) => STATUS[s]?.label, locale = 'en-IN' }) {
   const [layers, setLayers] = useState({ fields: true, cleared: false, chcs: true, fires: true });
   const shown = useMemo(() => fields.filter((f) => (f.status === 'cleared' ? layers.cleared : layers.fields)), [fields, layers]);
   const toggle = (k) => setLayers((s) => ({ ...s, [k]: !s[k] }));
@@ -40,8 +42,8 @@ export default function RiskMap({ fields = [], chcs = [], fires = [], centre, on
             <Tooltip direction="top">
               <div className="text-xs">
                 <b>{f.id}</b> {f.village}<br />
-                {f.acres} ac · {STATUS[f.status]?.label} · risk {f.risk}<br />
-                Deadline {fmtDate(f.deadline)}
+                {f.acres} ac · {statusLabel(f.status)} · {f.risk}<br />
+                {fmtDate(f.deadline, undefined, locale)}
               </div>
             </Tooltip>
           </CircleMarker>
@@ -55,10 +57,10 @@ export default function RiskMap({ fields = [], chcs = [], fires = [], centre, on
 
       <div className="absolute right-3 top-3 z-[500] flex flex-col gap-1 rounded-ctl bg-white/95 p-2 text-xs shadow-panel">
         {[
-          ['fields', 'Pending fields', '#2F8F4E'],
-          ['cleared', 'Cleared fields', '#9AA19C'],
-          ['chcs', 'Hiring centres', '#14211B'],
-          ['fires', 'Fire hotspots', '#D9482B'],
+          ['fields', t('layer_pending'), '#2F8F4E'],
+          ['cleared', t('layer_cleared'), '#9AA19C'],
+          ['chcs', t('layer_chcs'), '#14211B'],
+          ['fires', t('layer_fires'), '#D9482B'],
         ].map(([k, label, c]) => (
           <label key={k} className="flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 hover:bg-smoke-100">
             <input type="checkbox" checked={layers[k]} onChange={() => toggle(k)} className="accent-sprout-600" />
@@ -69,7 +71,7 @@ export default function RiskMap({ fields = [], chcs = [], fires = [], centre, on
       </div>
       <div className="absolute bottom-3 left-3 z-[500] flex gap-3 rounded-ctl bg-white/95 px-3 py-2 text-xs shadow-panel">
         {['high', 'medium', 'low'].map((k) => (
-          <span key={k} className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: RISK[k].color }} />{RISK[k].label}</span>
+          <span key={k} className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: RISK[k].color }} />{t(`risk_${k}`)}</span>
         ))}
       </div>
     </div>
