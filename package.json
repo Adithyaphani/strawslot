@@ -11,7 +11,7 @@
     "dev": "concurrently -n api,web -c green,yellow \"tsx watch server/index.ts\" \"vite\"",
     "dev:api": "tsx watch server/index.ts",
     "dev:web": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/build-function.mjs",
+    "build": "tsc --noEmit && vite build && tsx scripts/build-function.ts",
     "start": "tsx server/index.ts",
     "test": "tsx --test tests/*.test.ts",
     "seed:export": "tsx scripts/export-seed.ts",

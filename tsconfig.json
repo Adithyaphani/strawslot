@@ -17,5 +17,5 @@
     "allowImportingTsExtensions": false,
     "types": ["node", "vite/client"]
   },
-  "include": ["src", "server", "netlify/src", "scripts", "tests"]
+  "include": ["src", "server", "netlify/src", "scripts", "tests", "vite.config.ts", "tailwind.config.ts"]
 }

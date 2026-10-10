@@ -19,6 +19,9 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-validation-3E67B1?style=flat-square)
 ![Netlify](https://img.shields.io/badge/Netlify-Functions%20%2B%20Blobs-00C7B7?style=flat-square&logo=netlify&logoColor=white)
+![Python](https://img.shields.io/badge/Python-analytics-3776AB?style=flat-square&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-self--host-2496ED?style=flat-square&logo=docker&logoColor=white)
+![CI](https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=flat-square&logo=githubactions&logoColor=white)
 
 [**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
 
@@ -230,6 +233,15 @@ Development with hot reload: `npm run dev` (API on 8787, Vite on 5173).
 Type-check: `npm run typecheck` (strict-ish TypeScript across server and client).
 
 Tests: `npm test` (node:test via tsx) runs 11 engine tests covering capacity, harvest dates, tractor HP, rain blocking, officer pins, alerts, and optimiser vs baseline.
+
+**Extras**
+
+| Tool | Command | What it does |
+|---|---|---|
+| Python | `python3 analytics/season_report.py` | Recomputes season totals from the exported CSV, independent of the TypeScript engine |
+| Shell | `./scripts/smoke-test.sh https://your-site.netlify.app` | Post-deploy check of health, validation, auth and the officer API |
+| Docker | `docker build -t strawslot . && docker run -p 8787:8787 strawslot` | Self-host the whole app |
+| GitHub Actions | `.github/workflows/ci.yml` | Typecheck, tests, build and the Python report on every push |
 
 <details>
 <summary><b>API reference</b></summary>
