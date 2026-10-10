@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Phone, Copy, Check, MessageCircle, Tractor, Truck, AlertTriangle, CheckCircle2, Clock, Flag } from 'lucide-react';
 import SeasonStrip from '../../components/SeasonStrip.jsx';
 import { Button, Modal, useToast } from '../../components/ui.jsx';
-import { useI18n } from '../../lib/i18n.jsx';
+import { useI18n, Dual } from '../../lib/i18n.jsx';
 import { api } from '../../lib/api.js';
 import { fmtDay, todayIST } from '../../lib/format.js';
 
@@ -16,10 +16,10 @@ export default function SlotCard({ slot }) {
   const cleared = slot.status === 'cleared';
 
   const head = cleared
-    ? { icon: CheckCircle2, title: t('clearedTitle'), cls: 'bg-smoke-100 text-ink', sub: null }
+    ? { icon: CheckCircle2, k: 'clearedTitle', cls: 'bg-smoke-100 text-ink', sub: null }
     : atRisk
-      ? { icon: AlertTriangle, title: t('atRiskTitle'), cls: 'bg-fire-50 text-fire-600', sub: t('atRiskSub') }
-      : { icon: CheckCircle2, title: t('bookedTitle'), cls: 'bg-sprout-50 text-sprout-700', sub: null };
+      ? { icon: AlertTriangle, k: 'atRiskTitle', cls: 'bg-fire-50 text-fire-600', sub: t('atRiskSub') }
+      : { icon: CheckCircle2, k: 'bookedTitle', cls: 'bg-sprout-50 text-sprout-700', sub: null };
 
   const copy = async () => {
     try { await navigator.clipboard.writeText(slot.message); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* ignore */ }
@@ -30,7 +30,7 @@ export default function SlotCard({ slot }) {
       <div className={`flex items-start gap-3 px-5 py-4 ${head.cls}`}>
         <head.icon className="mt-0.5 h-6 w-6 shrink-0" />
         <div>
-          <h2 className="text-xl font-bold">{head.title}</h2>
+          <Dual k={head.k} as="h2" className="text-xl font-bold" subClassName="text-[0.72em] font-semibold opacity-75" />
           {head.sub && <p className="mt-1 text-sm leading-relaxed">{head.sub}</p>}
         </div>
         <span className="ml-auto shrink-0 rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-ink">{slot.id}</span>
@@ -43,10 +43,10 @@ export default function SlotCard({ slot }) {
         )}
 
         <dl className="grid grid-cols-2 gap-3 pb-4 pt-1">
-          {!cleared && slot.start && <Fact icon={Tractor} label={t('machineComes')} value={fmtDay(slot.start, locale)} strong />}
-          {!cleared && slot.completion && slot.completion !== slot.start && <Fact icon={CheckCircle2} label={t('finishes')} value={fmtDay(slot.completion, locale)} />}
-          <Fact icon={Clock} label={t('deadline')} value={fmtDay(slot.deadline, locale)} sub={!cleared && slot.daysLeft >= 0 ? `${slot.daysLeft} ${t('daysLeft')}` : null} />
-          {slot.pickups?.[0] && <Fact icon={Truck} label={t('pickup')} value={fmtDay(slot.pickups[0].date, locale)} sub={slot.vendor?.name} />}
+          {!cleared && slot.start && <Fact icon={Tractor} k="machineComes" value={fmtDay(slot.start, locale)} strong />}
+          {!cleared && slot.completion && slot.completion !== slot.start && <Fact icon={CheckCircle2} k="finishes" value={fmtDay(slot.completion, locale)} />}
+          <Fact icon={Clock} k="deadline" value={fmtDay(slot.deadline, locale)} sub={!cleared && slot.daysLeft >= 0 ? `${slot.daysLeft} ${t('daysLeft')}` : null} />
+          {slot.pickups?.[0] && <Fact icon={Truck} k="pickup" value={fmtDay(slot.pickups[0].date, locale)} sub={slot.vendor?.name} />}
         </dl>
 
         {slot.machine && slot.chc && !cleared && (
@@ -77,10 +77,10 @@ export default function SlotCard({ slot }) {
   );
 }
 
-function Fact({ icon: Icon, label, value, sub, strong }) {
+function Fact({ icon: Icon, k, value, sub, strong }) {
   return (
     <div className={`rounded-ctl px-3 py-2.5 ${strong ? 'bg-stubble-50' : 'bg-ground'}`}>
-      <dt className="flex items-center gap-1.5 text-xs text-ink-mute"><Icon className="h-3.5 w-3.5" />{label}</dt>
+      <dt className="flex items-start gap-1.5 text-xs text-ink-mute"><Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" /><Dual k={k} subClassName="text-[11px] opacity-80" /></dt>
       <dd className="mt-0.5 font-bold">{value}</dd>
       {sub && <dd className="text-xs text-ink-soft">{sub}</dd>}
     </div>

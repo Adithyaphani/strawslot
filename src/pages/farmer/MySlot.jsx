@@ -5,7 +5,7 @@ import { Button, ErrorBox, Spinner } from '../../components/ui.jsx';
 import SlotCard from './SlotCard.jsx';
 import { PageWrap } from './FarmerLayout.jsx';
 import { Ticket } from 'lucide-react';
-import { useI18n } from '../../lib/i18n.jsx';
+import { useI18n, Dual } from '../../lib/i18n.jsx';
 import { api } from '../../lib/api.js';
 
 export default function MySlot() {
@@ -39,12 +39,12 @@ export default function MySlot() {
     <PageWrap>
     <div className="grid items-start gap-6 lg:grid-cols-[380px_1fr] lg:gap-10">
     <div className="lg:sticky lg:top-24">
-      <h1 className="text-[32px] font-extrabold sm:text-[40px]">{t('lookupTitle')}</h1>
+      <Dual k="lookupTitle" as="h1" className="text-[32px] font-extrabold sm:text-[40px]" subClassName="text-[0.5em] font-bold text-stubble-700" />
       <p className="mt-1 text-ink-soft">{t('lookupSub')}</p>
       <form className="panel mt-5 space-y-3 p-5" onSubmit={(e) => { e.preventDefault(); find(); }}>
         <label className="label" htmlFor="ph">{t('mobile')}</label>
         <input id="ph" className="input num text-xl tracking-wider" inputMode="numeric" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} placeholder={t('mobilePh')} />
-        <Button type="submit" size="lg" className="w-full" icon={Search} loading={busy}>{t('find')}</Button>
+        <Button type="submit" size="lg" className="w-full" icon={Search} loading={busy}><Dual k="find" inline subClassName="text-sm font-medium opacity-80" /></Button>
       </form>
       {demo && !slots && (
         <button className="mt-2 text-sm font-semibold text-sprout-700 underline" onClick={() => { setPhone(demo); find(demo); }}>

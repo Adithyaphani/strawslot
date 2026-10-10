@@ -19,7 +19,7 @@ Small farmers burn paddy straw because no one schedules machines, tractors and p
 | | Farmer side (no login) | Officer side (login) |
 |---|---|---|
 | Who | Small and marginal paddy farmers | District / block crop-residue nodal officers |
-| Language | Punjabi, Hindi, English | English, Punjabi |
+| Language | English by default with Punjabi shown alongside; full Punjabi or Hindi on tap | English, Punjabi |
 | Key screens | Book a machine (3-step wizard), check my booking, straw value calculator | District overview, early warnings, dispatch board, fields, what-if planner, machines & centres, activity log |
 
 **Core engine**

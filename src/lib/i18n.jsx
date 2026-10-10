@@ -295,19 +295,38 @@ Object.assign(D.pa, {
 });
 
 export const LOCALES = { en: 'en-IN', hi: 'hi-IN', pa: 'pa-IN' };
+// English is the default. While English is on, the district's local language
+// (Punjabi for Sangrur) is shown beside key headings, buttons and labels.
+export const LOCAL_LANG = 'pa';
 const Ctx = createContext(null);
 
 export function I18nProvider({ children }) {
   const [lang, setLang] = useState(() => {
-    try { return localStorage.getItem('strawslot.lang') || 'pa'; } catch { return 'pa'; }
+    try { return localStorage.getItem('strawslot.lang.v2') || 'en'; } catch { return 'en'; }
   });
   useEffect(() => {
-    try { localStorage.setItem('strawslot.lang', lang); } catch { /* ignore */ }
+    try { localStorage.setItem('strawslot.lang.v2', lang); } catch { /* ignore */ }
     document.documentElement.lang = lang;
   }, [lang]);
   const t = (k) => D[lang]?.[k] ?? D.en[k] ?? k;
-  return <Ctx.Provider value={{ lang, setLang, t, locale: LOCALES[lang] }}>{children}</Ctx.Provider>;
+  // Companion text in the local language, only while the page is in English.
+  const tl = (k) => (lang === 'en' ? D[LOCAL_LANG]?.[k] ?? null : null);
+  return <Ctx.Provider value={{ lang, setLang, t, tl, locale: LOCALES[lang] }}>{children}</Ctx.Provider>;
 }
 
 export const useI18n = () => useContext(Ctx);
-export const LANGS = Object.keys(D).map((k) => ({ code: k, name: D[k].langName }));
+export const LANGS = ['en', 'pa', 'hi'].map((k) => ({ code: k, name: D[k].langName }));
+
+/** English text with the Punjabi version beside it (stacked). In Punjabi/Hindi mode it shows one language. */
+export function Dual({ k, as: Tag = 'span', className = '', subClassName = 'text-[0.62em] font-semibold opacity-70', inline = false }) {
+  const { t, tl } = useI18n();
+  const local = tl(k);
+  return (
+    <Tag className={className}>
+      {t(k)}
+      {local && (inline
+        ? <span lang={LOCAL_LANG} className={`ml-2 ${subClassName}`}>{local}</span>
+        : <span lang={LOCAL_LANG} className={`mt-1 block leading-snug ${subClassName}`}>{local}</span>)}
+    </Tag>
+  );
+}

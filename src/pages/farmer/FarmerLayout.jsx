@@ -1,7 +1,7 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { Home, CalendarPlus, Ticket, Calculator } from 'lucide-react';
 import { Logo } from '../../components/ui.jsx';
-import { useI18n, LANGS } from '../../lib/i18n.jsx';
+import { useI18n, LANGS, Dual } from '../../lib/i18n.jsx';
 
 export function LangSwitch({ dark = false }) {
   const { lang, setLang } = useI18n();
@@ -20,10 +20,10 @@ export function LangSwitch({ dark = false }) {
 export default function FarmerLayout() {
   const { t } = useI18n();
   const nav = [
-    ['/farmer', Home, t('home'), true],
-    ['/farmer/register', CalendarPlus, t('register')],
-    ['/farmer/slot', Ticket, t('mySlot')],
-    ['/farmer/calculator', Calculator, t('calc')],
+    ['/farmer', Home, 'home', true],
+    ['/farmer/register', CalendarPlus, 'register'],
+    ['/farmer/slot', Ticket, 'mySlot'],
+    ['/farmer/calculator', Calculator, 'calc'],
   ];
   return (
     <div className="flex min-h-screen flex-col pb-24 lg:pb-0">
@@ -33,7 +33,7 @@ export default function FarmerLayout() {
           <nav className="hidden items-center gap-1 lg:flex">
             {nav.map(([to, Icon, label, end]) => (
               <NavLink key={to} to={to} end={end} className={({ isActive }) => `flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${isActive ? 'bg-sprout-900 text-white' : 'text-ink-soft hover:bg-white'}`}>
-                <Icon className="h-4 w-4" />{label}
+                <Icon className="h-4 w-4 shrink-0" /><Dual k={label} className="leading-tight" subClassName="text-[0.78em] font-medium opacity-75" />
               </NavLink>
             ))}
           </nav>
@@ -58,7 +58,7 @@ export default function FarmerLayout() {
               className={({ isActive }) => `flex flex-col items-center gap-1 px-1 py-2.5 text-[11px] font-semibold leading-tight ${isActive ? 'text-sprout-700' : 'text-ink-mute'}`}>
               {({ isActive }) => (<>
                 <span className={`grid h-7 w-12 place-items-center rounded-full ${isActive ? 'bg-sprout-100' : ''}`}><Icon className="h-5 w-5" /></span>
-                <span className="line-clamp-1 text-center">{label}</span>
+                <span className="line-clamp-1 text-center">{t(label)}</span>
               </>)}
             </NavLink>
           ))}

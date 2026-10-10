@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Wheat, IndianRupee, Leaf, Wind } from 'lucide-react';
-import { useI18n } from '../../lib/i18n.jsx';
+import { useI18n, Dual } from '../../lib/i18n.jsx';
 import { fmtNum } from '../../lib/format.js';
 import { PageWrap } from './FarmerLayout.jsx';
 
@@ -18,7 +18,7 @@ export default function StrawCalc() {
 
   return (
     <PageWrap>
-      <h1 className="text-[32px] font-extrabold sm:text-[40px]">{t('calcTitle')}</h1>
+      <Dual k="calcTitle" as="h1" className="text-[32px] font-extrabold sm:text-[40px]" subClassName="text-[0.5em] font-bold text-stubble-700" />
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[400px_1fr]">
       <div className="panel space-y-6 p-6">
         <div>

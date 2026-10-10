@@ -6,7 +6,7 @@ import SlotCard from './SlotCard.jsx';
 import { PageWrap } from './FarmerLayout.jsx';
 import SeasonStrip from '../../components/SeasonStrip.jsx';
 import { CalendarClock, Tractor as TractorIcon } from 'lucide-react';
-import { useI18n, LANGS } from '../../lib/i18n.jsx';
+import { useI18n, LANGS, Dual } from '../../lib/i18n.jsx';
 import { api } from '../../lib/api.js';
 import { todayIST, addDays, fmtDay } from '../../lib/format.js';
 
@@ -95,7 +95,7 @@ export default function Register() {
     <PageWrap>
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_400px] lg:gap-10">
     <div>
-      <h1 className="text-[32px] font-extrabold sm:text-[40px]">{t('register')}</h1>
+      <Dual k="register" as="h1" className="text-[32px] font-extrabold sm:text-[40px]" subClassName="text-[0.5em] font-bold text-stubble-700" />
       <p className="mt-1 text-ink-soft">{t('registerSub')}</p>
       <ol className="mt-4 flex gap-2" aria-label="Progress">
         {steps.map((s, i) => (
@@ -108,13 +108,13 @@ export default function Register() {
 
       <div className="panel mt-5 space-y-6 p-5 sm:p-7">
         {step === 0 && (<>
-          <Field label={t('name')} error={errors.farmerName}>
+          <Field k="name" error={errors.farmerName}>
             <input className="input" value={f.farmerName} onChange={(e) => set('farmerName', e.target.value)} placeholder={t('namePh')} autoComplete="name" />
           </Field>
-          <Field label={t('mobile')} error={errors.phone}>
+          <Field k="mobile" error={errors.phone}>
             <input className="input num" inputMode="numeric" maxLength={10} value={f.phone} onChange={(e) => set('phone', e.target.value.replace(/\D/g, ''))} placeholder={t('mobilePh')} autoComplete="tel" />
           </Field>
-          <Field label={t('village')} error={errors.villageId}>
+          <Field k="village" error={errors.villageId}>
             <select className="input" value={f.villageId} onChange={(e) => set('villageId', e.target.value)}>
               <option value="">{meta ? t('villagePh') : '…'}</option>
               {villagesByBlock.map((b) => (
@@ -128,7 +128,7 @@ export default function Register() {
               {geo === 'busy' ? t('locating') : geo === 'done' ? t('located') : t('useLocation')}
             </button>
           </Field>
-          <Field label={t('language')}>
+          <Field k="language">
             <div className="flex gap-2">
               {LANGS.map((l) => (
                 <button key={l.code} type="button" onClick={() => set('language', l.code)}
@@ -139,20 +139,20 @@ export default function Register() {
         </>)}
 
         {step === 1 && (<>
-          <Field label={t('acres')} error={errors.acres}>
+          <Field k="acres" error={errors.acres}>
             <input className="input num" type="number" inputMode="decimal" min="0.25" step="0.25" value={f.acres} onChange={(e) => set('acres', e.target.value)} placeholder="4" />
             <div className="mt-2 flex gap-2">{[1, 2.5, 5, 10].map((a) => <Chip key={a} on={Number(f.acres) === a} onClick={() => set('acres', a)}>{a}</Chip>)}</div>
           </Field>
-          <Field label={t('harvest')} error={errors.harvestDate}>
+          <Field k="harvest" error={errors.harvestDate}>
             <input className="input" type="date" value={f.harvestDate} onChange={(e) => set('harvestDate', e.target.value)} />
           </Field>
-          <Field label={t('window')} hint={t('windowHint')}>
+          <Field k="window" hint={t('windowHint')}>
             <div className="flex items-center gap-3">
               <input type="range" min="10" max="25" value={f.windowDays} onChange={(e) => set('windowDays', e.target.value)} className="flex-1 accent-sprout-600" />
               <span className="num w-10 text-right text-lg font-bold">{f.windowDays}</span>
             </div>
           </Field>
-          <Field label={t('pref')}>
+          <Field k="pref">
             <div className="grid gap-2">
               {[['in_situ', Sprout, t('prefIn'), t('prefInSub')], ['ex_situ', Package, t('prefEx'), t('prefExSub')], ['any', Shuffle, t('prefAny'), t('prefAnySub')]].map(([v, Icon, a, b]) => (
                 <button key={v} type="button" onClick={() => set('preference', v)}
@@ -166,7 +166,7 @@ export default function Register() {
         </>)}
 
         {step === 2 && (<>
-          <Field label={t('ownTractor')}>
+          <Field k="ownTractor">
             <div className="flex gap-2">
               {[[true, t('yes')], [false, t('no')]].map(([v, l]) => (
                 <button key={String(v)} type="button" onClick={() => set('tractor', { ...f.tractor, owns: v })}
@@ -175,7 +175,7 @@ export default function Register() {
             </div>
           </Field>
           {f.tractor.owns && (
-            <Field label={t('hp')} hint={t('hpHint')} error={errors.hp}>
+            <Field k="hp" hint={t('hpHint')} error={errors.hp}>
               <div className="flex flex-wrap gap-2">{[35, 40, 45, 50, 55, 60, 75].map((hp) => <Chip key={hp} on={Number(f.tractor.hp) === hp} onClick={() => set('tractor', { ...f.tractor, hp })}>{hp} HP</Chip>)}</div>
             </Field>
           )}
@@ -186,8 +186,8 @@ export default function Register() {
         <div className="flex gap-2 pt-1">
           {step > 0 && <Button variant="outline" size="lg" onClick={() => setStep(step - 1)}>{t('back')}</Button>}
           {step < 2
-            ? <Button size="lg" className="flex-1" onClick={next}>{t('next')}</Button>
-            : <Button size="lg" className="flex-1" loading={busy} onClick={submit}>{busy ? t('submitting') : t('submit')}</Button>}
+            ? <Button size="lg" className="flex-1" onClick={next}><Dual k="next" inline subClassName="text-sm font-medium opacity-80" /></Button>
+            : <Button size="lg" className="flex-1" loading={busy} onClick={submit}>{busy ? t('submitting') : <Dual k="submit" inline subClassName="text-sm font-medium opacity-80" />}</Button>}
         </div>
       </div>
     </div>
@@ -245,10 +245,10 @@ function Preview({ f, meta }) {
   );
 }
 
-function Field({ label, hint, error, children }) {
+function Field({ k, hint, error, children }) {
   return (
     <div>
-      <label className={`label ${error ? 'text-fire-600' : ''}`}>{label}</label>
+      <Dual k={k} as="label" className={`label ${error ? 'text-fire-600' : ''}`} subClassName="ml-2 inline text-xs font-medium text-ink-mute" inline />
       <div className={error ? '[&_.input]:border-fire-500' : ''}>{children}</div>
       {hint && <p className="hint">{hint}</p>}
     </div>

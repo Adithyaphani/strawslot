@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { CalendarPlus, Ticket, Calculator, Sprout, Wind, Gavel, Phone, BadgeCheck, Smartphone, Languages, MapPin } from 'lucide-react';
 import FieldScene from '../../components/FieldScene.jsx';
-import { useI18n } from '../../lib/i18n.jsx';
+import { useI18n, Dual } from '../../lib/i18n.jsx';
 import { useLoad } from '../../lib/useLoad.js';
 import { api } from '../../lib/api.js';
 
@@ -17,14 +17,14 @@ export default function FarmerHome() {
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:gap-10 lg:px-8 lg:pt-14">
           <div className="relative z-10 pb-4 lg:pb-16">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-sm font-semibold text-stubble-700 shadow-sm"><MapPin className="h-4 w-4" />{t('kicker')}</p>
-            <h1 className="mt-4 text-[38px] font-extrabold leading-[1.05] text-sprout-900 sm:text-[52px] lg:text-[60px]">{t('homeTitle')}</h1>
-            <p className="mt-4 max-w-[46ch] text-[17px] leading-relaxed text-ink-soft lg:text-lg">{t('homeSub')}</p>
+            <Dual k="homeTitle" as="h1" className="mt-4 text-[38px] font-extrabold leading-[1.05] text-sprout-900 sm:text-[52px] lg:text-[60px]" subClassName="text-[0.45em] font-bold text-stubble-700" />
+            <Dual k="homeSub" as="p" className="mt-4 max-w-[52ch] text-[17px] leading-relaxed text-ink-soft lg:text-lg" subClassName="text-[0.88em] text-ink-mute" />
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link to="/farmer/register" className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-sprout-600 px-7 text-lg font-bold text-white shadow-lg shadow-sprout-600/25 transition hover:bg-sprout-700">
-                <CalendarPlus className="h-5 w-5" />{t('bookCta')}
+                <CalendarPlus className="h-5 w-5 shrink-0" /><Dual k="bookCta" className="text-left leading-tight" subClassName="text-[0.72em] font-semibold opacity-85" />
               </Link>
               <Link to="/farmer/slot" className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-ink/15 bg-white px-7 text-lg font-semibold text-ink transition hover:border-ink/40">
-                <Ticket className="h-5 w-5" />{t('mySlot')}
+                <Ticket className="h-5 w-5 shrink-0" /><Dual k="mySlot" className="text-left leading-tight" subClassName="text-[0.72em] font-semibold opacity-70" />
               </Link>
             </div>
             <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink-soft">
@@ -42,7 +42,7 @@ export default function FarmerHome() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Steps: a real sequence, so numbered */}
         <section className="py-12 lg:py-16">
-          <h2 className="text-[28px] font-extrabold sm:text-[34px]">{t('stepsTitle')}</h2>
+          <Dual k="stepsTitle" as="h2" className="text-[28px] font-extrabold sm:text-[34px]" subClassName="text-[0.6em] font-bold text-stubble-700" />
           <ol className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[['s1', 's1d'], ['s2', 's2d'], ['s3', 's3d'], ['s4', 's4d']].map(([a, b], i) => (
               <li key={a} className="relative">
@@ -50,7 +50,7 @@ export default function FarmerHome() {
                   <span className="grid h-11 w-11 place-items-center rounded-full bg-stubble-500 font-display text-lg font-extrabold text-ink">{i + 1}</span>
                   {i < 3 && <span className="hidden h-0.5 flex-1 bg-gradient-to-r from-stubble-300 to-transparent lg:block" />}
                 </div>
-                <h3 className="mt-4 text-lg font-bold">{t(a)}</h3>
+                <Dual k={a} as="h3" className="mt-4 text-lg font-bold" subClassName="text-[0.8em] font-semibold text-stubble-700" />
                 <p className="mt-1 text-[15px] leading-relaxed text-ink-soft">{t(b)}</p>
               </li>
             ))}
@@ -59,26 +59,26 @@ export default function FarmerHome() {
 
         {/* Tools */}
         <section className="grid gap-4 md:grid-cols-3">
-          <Tile to="/farmer/register" icon={CalendarPlus} title={t('register')} sub={t('registerSub')} tone="bg-sprout-900 text-white" iconTone="bg-white/10 text-stubble-300" />
-          <Tile to="/farmer/slot" icon={Ticket} title={t('mySlot')} sub={t('mySlotSub')} />
-          <Tile to="/farmer/calculator" icon={Calculator} title={t('calc')} sub={t('calcSub')} />
+          <Tile to="/farmer/register" icon={CalendarPlus} k="register" sub={t('registerSub')} tone="bg-sprout-900 text-white" iconTone="bg-white/10 text-stubble-300" />
+          <Tile to="/farmer/slot" icon={Ticket} k="mySlot" sub={t('mySlotSub')} />
+          <Tile to="/farmer/calculator" icon={Calculator} k="calc" sub={t('calcSub')} />
         </section>
 
         {/* Why + centres */}
         <section className="mt-12 grid items-start gap-6 lg:grid-cols-[1.1fr_1fr]">
           <div className="rounded-[20px] bg-sprout-900 p-6 text-white sm:p-8">
-            <h2 className="text-[26px] font-extrabold">{t('whyTitle')}</h2>
+            <Dual k="whyTitle" as="h2" className="text-[26px] font-extrabold" subClassName="text-[0.6em] font-bold text-stubble-300" />
             <ul className="mt-6 space-y-5">
-              {[[Sprout, t('why1')], [Wind, t('why2')], [Gavel, t('why3')]].map(([Icon, text]) => (
-                <li key={text} className="flex gap-4">
+              {[[Sprout, 'why1'], [Wind, 'why2'], [Gavel, 'why3']].map(([Icon, key]) => (
+                <li key={key} className="flex gap-4">
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/10"><Icon className="h-5 w-5 text-stubble-300" /></span>
-                  <p className="pt-2 text-[16px] leading-relaxed text-sprout-50">{text}</p>
+                  <Dual k={key} as="p" className="pt-2 text-[16px] leading-relaxed text-sprout-50" subClassName="text-[0.85em] text-sprout-200" />
                 </li>
               ))}
             </ul>
           </div>
           <div className="panel p-6 sm:p-7">
-            <h2 className="text-xl font-bold">{t('centresTitle')}</h2>
+            <Dual k="centresTitle" as="h2" className="text-xl font-bold" subClassName="text-[0.75em] font-semibold text-stubble-700" />
             <p className="mt-1 text-sm text-ink-mute">{t('centresSub')}</p>
             <ul className="mt-4 divide-y divide-line">
               {(meta.data?.chcs || []).map((c) => (
@@ -98,12 +98,12 @@ export default function FarmerHome() {
   );
 }
 
-function Tile({ to, icon: Icon, title, sub, tone = 'bg-white text-ink border border-line', iconTone = 'bg-sprout-50 text-sprout-700' }) {
+function Tile({ to, icon: Icon, k, sub, tone = 'bg-white text-ink border border-line', iconTone = 'bg-sprout-50 text-sprout-700' }) {
   return (
     <Link to={to} className={`group flex items-center gap-4 rounded-[18px] p-5 shadow-panel transition hover:-translate-y-0.5 hover:shadow-pop ${tone}`}>
       <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${iconTone}`}><Icon className="h-7 w-7" /></span>
       <span>
-        <span className="block text-lg font-bold">{title}</span>
+        <Dual k={k} className="block text-lg font-bold leading-tight" subClassName="text-[0.78em] font-semibold opacity-75" />
         <span className="block text-sm opacity-75">{sub}</span>
       </span>
     </Link>
