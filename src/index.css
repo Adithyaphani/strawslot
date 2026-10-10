@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { font-feature-settings: 'tnum' 0; }
+  h1, h2, h3 { font-family: theme('fontFamily.display'); letter-spacing: -0.015em; }
+  :focus-visible { outline: 3px solid theme('colors.stubble.500'); outline-offset: 2px; border-radius: 6px; }
+  ::selection { background: theme('colors.stubble.100'); }
+}
+
+@layer components {
+  .num { font-variant-numeric: tabular-nums; }
+  .panel { @apply bg-panel rounded-panel border border-line shadow-panel; }
+  .input { @apply w-full rounded-ctl border border-line bg-white px-3.5 py-3 text-[15px] text-ink placeholder:text-smoke-400 focus:border-sprout-500 focus:outline-none focus:ring-4 focus:ring-sprout-100 transition; }
+  .label { @apply block text-sm font-semibold text-ink mb-1.5; }
+  .hint { @apply text-xs text-ink-mute mt-1; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold; }
+  .tbl th { @apply text-left text-xs font-semibold text-ink-mute px-3 py-2.5 border-b border-line bg-ground/60 sticky top-0; }
+  .tbl td { @apply px-3 py-2.5 border-b border-line/70 text-sm; }
+  .tbl tr:hover td { @apply bg-sprout-50/50; }
+}
+
+.leaflet-container { font-family: theme('fontFamily.sans'); background: #E9EEE6; }
+.leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 12px 32px -12px rgba(20,33,27,.35); }
+.leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
