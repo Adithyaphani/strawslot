@@ -190,8 +190,8 @@ The demo season is generated around today's date so the app always shows an acti
 
 | | Where | Login |
 |---|---|---|
-| 👨‍🌾 Farmer side | `/farmer` | None. Use **Try a demo number** on *Check my booking* |
-| 🏛️ Officer side | `/admin` | `officer` / `sangrur2026` (or tap **Fill demo login**) |
+| 👨‍🌾 Farmer side | `/farmer` | None. Demo phone `9000000001`, or tap **Open farmer app** on the home page |
+| 🏛️ Officer side | `/admin` | `officer` / `sangrur2026`. Or tap **Open demo dashboard** on the home page for one-click entry |
 
 ---
 

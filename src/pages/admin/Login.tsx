@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { LogIn, Info } from 'lucide-react';
 import { Logo, Button, ErrorBox } from '../../components/ui';
 import { api, session } from '../../lib/api';
+import { loginAsDemoOfficer } from '../../components/DemoAccess';
 import { useAT, AdminLangSwitch } from '../../lib/adminI18n';
 
 export default function Login() {
@@ -60,6 +61,7 @@ export default function Login() {
               <p className="font-semibold">{t('demo_title')}</p>
               <p className="text-ink-soft">{t('demo_body', { u: 'officer', p: 'sangrur2026' })}</p>
               <button type="button" className="mt-1 font-semibold text-sprout-700 underline" onClick={() => { setUser('officer'); setPassword('sangrur2026'); }}>{t('fill_demo')}</button>
+              <button type="button" className="ml-3 font-semibold text-sprout-700 underline" onClick={async () => { setBusy(true); setError(null); try { await loginAsDemoOfficer(); nav('/admin', { replace: true }); } catch (err) { setError(err); } finally { setBusy(false); } }}>Sign in now</button>
             </div>
           </div>
           <Link to="/farmer" className="mt-6 block text-center text-sm text-ink-mute underline">{t('farmer_link')}</Link>

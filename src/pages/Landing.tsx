@@ -5,6 +5,7 @@ import { Tractor, ShieldCheck, Clock3, Wheat, CalendarClock, Flame, CloudRain, B
 import { Logo, LiveDot } from '../components/ui';
 import SeasonStrip from '../components/SeasonStrip';
 import FieldScene from '../components/FieldScene';
+import DemoAccess from '../components/DemoAccess';
 import { api } from '../lib/api';
 import { addDays, fmtNum, todayIST } from '../lib/format';
 
@@ -49,6 +50,7 @@ export default function Landing() {
                 </Link>
               </div>
               <p className="mt-4 text-sm text-ink-mute">Farmers book in Punjabi, Hindi or English. Officers work in English or Punjabi.</p>
+              <DemoAccess className="mt-6 max-w-xl" />
             </div>
             <div className="-mx-4 sm:-mx-6 lg:mx-0 lg:mb-6 lg:overflow-hidden lg:rounded-[28px] lg:shadow-pop">
               <FieldScene className="block h-[260px] w-full sm:h-[360px] lg:h-[520px]" />
