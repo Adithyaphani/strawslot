@@ -31,16 +31,19 @@ test('40 farmers booking at the same instant: unique ids, no errors, and far few
   assert.equal(overview.stats.fields.total, 640 + 40);
 });
 
-test('simultaneous auto-fix-all calls serialise cleanly (no 500s, no lost pins)', async () => {
+test('simultaneous auto-fix-all calls: one sweep runs, the others are told so (409), nothing fails or is lost', async () => {
   const t = await h.officerToken();
   const start = (await h.call('GET', `${V1}/admin/overview`, { token: t })).body.stats.fields.atRisk;
   const rs = await Promise.all([1, 2, 3].map(() => h.call('POST', `${V1}/admin/autofix-all`, { token: t })));
-  assert.ok(rs.every((r) => r.status === 200), JSON.stringify(rs.map((r) => r.status)));
+  const codes = rs.map((r) => r.status).sort();
+  assert.ok(rs.every((r) => r.status === 200 || r.status === 409), JSON.stringify(codes));
+  assert.ok(rs.some((r) => r.status === 200), 'one sweep must run');
   const end = (await h.call('GET', `${V1}/admin/overview`, { token: t })).body.stats.fields.atRisk;
   assert.ok(end <= start);
   const { query } = await import('../src/db/pool.js');
-  const dupes = await query('select field_id, count(*) from pins group by field_id having count(*) > 1');
-  assert.equal(dupes.length, 0);
+  assert.equal((await query('select field_id from pins group by field_id having count(*) > 1')).length, 0);
+  // once the sweep is over, a new one is accepted again
+  assert.equal((await h.call('POST', `${V1}/admin/autofix-all`, { token: t })).status, 200);
 });
 
 test('optimistic locking: of several simultaneous edits using the same version, exactly one wins', async () => {
