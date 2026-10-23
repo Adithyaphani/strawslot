@@ -24,3 +24,10 @@ Kubernetes manifests (HPA, PDB, probes, migrate job) are in `deploy/k8s/`.
 
 ## Layout
 `src/http` routes + OpenAPI · `src/services` business logic and plan cache · `src/repositories` SQL · `src/domain` scheduler engine · `src/jobs` outbox and scheduled jobs · `deploy/` infra.
+
+## Host it (Render) and connect the Netlify site
+1. Render dashboard -> New -> Blueprint -> choose this repo. It reads `render.yaml` at the repo root and creates the API, Postgres and Redis. Wait for `/health/ready` to turn healthy.
+2. Open `https://<your-service>.onrender.com/health/ready` and `/docs` to check it.
+3. In `netlify.toml`, point the API redirect at it, then redeploy Netlify:
+   `from = "/api/*"`, `to = "https://<your-service>.onrender.com/api/:splat"`, `status = 200`, `force = true`
+Free plans sleep after about 15 minutes idle (first request takes ~30 s) and the free Postgres expires after 30 days; use a paid plan for anything long-lived.
