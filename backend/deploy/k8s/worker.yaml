@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: strawslot-worker, labels: { app: strawslot-worker } }
+spec:
+  replicas: 2            # safe: outbox uses SKIP LOCKED, periodic jobs are leader-elected via advisory lock
+  selector: { matchLabels: { app: strawslot-worker } }
+  template:
+    metadata:
+      labels: { app: strawslot-worker }
+      annotations: { prometheus.io/scrape: "true", prometheus.io/port: "9100" }
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext: { runAsNonRoot: true, runAsUser: 1000 }
+      containers:
+        - name: worker
+          image: strawslot/backend:latest
+          command: ["node", "dist/worker.js"]
+          ports: [{ containerPort: 9100 }]
+          envFrom: [{ configMapRef: { name: strawslot-config } }, { secretRef: { name: strawslot-secrets } }]
+          resources: { requests: { cpu: 100m, memory: 192Mi }, limits: { cpu: 500m, memory: 384Mi } }
+          livenessProbe: { httpGet: { path: /, port: 9100 }, periodSeconds: 15 }

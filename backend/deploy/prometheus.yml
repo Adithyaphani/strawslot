@@ -1,0 +1,7 @@
+global: { scrape_interval: 15s }
+scrape_configs:
+  - job_name: strawslot-api
+    metrics_path: /metrics
+    dns_sd_configs: [{ names: [api], type: A, port: 8080 }]
+  - job_name: strawslot-worker
+    static_configs: [{ targets: ["worker:9100"] }]
