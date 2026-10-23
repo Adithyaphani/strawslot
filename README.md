@@ -11,7 +11,7 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Theme](https://img.shields.io/badge/theme-Climate%20%26%20Sustainability-2F8F4E?style=flat-square)
 ![Hackathon](https://img.shields.io/badge/Social%20Impact%20Hackathon-2026-D9A93A?style=flat-square)
 ![Languages](https://img.shields.io/badge/languages-English%20%7C%20%E0%A8%AA%E0%A9%B0%E0%A8%9C%E0%A8%BE%E0%A8%AC%E0%A9%80%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A5%80-1C5C32?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-11%20passing-2F8F4E?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-61%20passing-2F8F4E?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)
@@ -23,7 +23,7 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Docker](https://img.shields.io/badge/Docker-self--host-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![CI](https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=flat-square&logo=githubactions&logoColor=white)
 
-[**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally)
+[**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally) · [**Backend**](#-production-backend)
 
 <br/>
 
@@ -219,6 +219,14 @@ Netlify Blobs (state)   ·   local: JSON file / in-memory
 ---
 
 <a id="run-locally"></a>
+
+## 🏭 Production backend
+
+The `backend/` folder is the production-shaped server for StrawSlot: a versioned REST API (36 endpoints, OpenAPI at `/docs`), PostgreSQL with Redis as an optional shared cache, role-based login with rotating refresh tokens, a transactional SMS outbox, background workers, metrics and health checks, plus Docker Compose and Kubernetes files. It runs the same scheduling engine as the demo app and keeps the old `/api` paths, so the web app works against it unchanged.
+
+- 50 backend tests pass (concurrency, outbox, rate limits, Redis on and off), plus the 11 engine tests here.
+- Measured on a small 2-CPU box: about 900 to 2,600 requests per second on cached reads. Scheduler cost rises steeply past a few thousand fields in one district, and the guide explains the planned fix.
+- Start here: [`backend/README.md`](backend/README.md), then the [architecture and operations guide](backend/docs/StrawSlot-Backend-Architecture-and-Operations-Guide.pdf).
 
 ## 💻 Run locally
 
