@@ -6,9 +6,11 @@
 [functions]
   node_bundler = "none"
 
+# /api now goes to the production backend on Render (Postgres + Redis, see backend/).
+# To fall back to the built-in demo function, swap the `to` line for: /.netlify/functions/api/:splat
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
+  to = "https://strawslot-api.onrender.com/api/:splat"
   status = 200
   force = true
 
