@@ -22,7 +22,7 @@ export default function Login() {
     setBusy(true); setError(null);
     try {
       const r = await api('/auth/login', { method: 'POST', body: { user, password } });
-      session.set(r.token, r.user);
+      session.set(r.token, r.user, r.refreshToken);
       nav('/admin', { replace: true });
     } catch (err) { setError(err); } finally { setBusy(false); }
   };

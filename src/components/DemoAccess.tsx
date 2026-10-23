@@ -6,8 +6,8 @@ import { api, session } from '../lib/api';
 export const DEMO = { user: 'officer', password: 'sangrur2026', farmerPhone: '9000000001' };
 
 export async function loginAsDemoOfficer() {
-  const r = await api<{ token: string; user: any }>('/auth/login', { method: 'POST', body: { user: DEMO.user, password: DEMO.password } });
-  session.set(r.token, r.user);
+  const r = await api<{ token: string; refreshToken?: string; user: any }>('/auth/login', { method: 'POST', body: { user: DEMO.user, password: DEMO.password } });
+  session.set(r.token, r.user, r.refreshToken);
 }
 
 /** Built-in demo credentials with one-click entry, so judges never need to type anything. */
