@@ -8,7 +8,11 @@ export default function AdminLayout() {
   const nav = useNavigate();
   const { t } = useAT();
   const user = session.user();
-  const logout = () => { session.clear(); nav('/admin/login'); };
+  const logout = () => {
+    const rt = session.refresh();
+    if (rt) fetch('/api/auth/logout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ refreshToken: rt }) }).catch(() => {});
+    session.clear(); nav('/admin/login');
+  };
   const NAV: [string, LucideIcon, string, boolean?][] = [
     ['/admin', LayoutDashboard, t('nav_overview'), true],
     ['/admin/alerts', BellRing, t('nav_alerts')],
