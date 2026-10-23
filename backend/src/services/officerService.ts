@@ -163,6 +163,10 @@ export async function autofix(d: string, actor: string, fieldId: string) {
 export async function autofixAll(d: string, actor: string) {
   let out: any;
   await tx(async (c) => {
+    // A sweep is CPU-heavy. A second one started while the first runs would only queue behind it
+    // and likely hit the request timeout, so say so immediately instead.
+    const free = (await c.query("select pg_try_advisory_xact_lock(hashtext($1)) as ok", ['autofix:' + d])).rows[0].ok;
+    if (!free) throw conflict('An auto-fix sweep is already running for this district. Try again in a few seconds.');
     await lockDistrict(c, d);
     const state = await loadState(d, c);
     const opts = await freshOpts(d);
