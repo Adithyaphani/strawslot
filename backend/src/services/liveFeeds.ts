@@ -21,7 +21,7 @@ export function fallbackWeather(): Snapshot {
   return { source: 'fallback', live: false, fetchedAt: new Date().toISOString(), payload: { days } };
 }
 export function fallbackAir(): Snapshot {
-  return { source: 'unavailable', live: false, fetchedAt: new Date().toISOString(), payload: { spots: [{ id: 'sangrur', name: 'Sangrur', pm25: null, usAqi: null }, { id: 'delhi', name: 'New Delhi', pm25: null, usAqi: null }] } };
+  return { source: 'unavailable', live: false, fetchedAt: new Date().toISOString(), payload: { spots: [{ id: 'sangrur', name: 'Sangrur', lat: DISTRICT.centre.lat, lon: DISTRICT.centre.lon, pm25: null, usAqi: null }, { id: 'delhi', name: 'New Delhi', lat: 28.6139, lon: 77.209, pm25: null, usAqi: null }] } };
 }
 
 export async function fetchWeather(centre = DISTRICT.centre): Promise<Snapshot> {
