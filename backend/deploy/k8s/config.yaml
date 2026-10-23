@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: strawslot-config }
+data:
+  NODE_ENV: production
+  RUN_WORKER_IN_API: "false"
+  MIGRATE_ON_BOOT: "false"
+  TRUST_PROXY: "1"
+  CORS_ORIGINS: https://strawslot.example
+  REDIS_URL: redis://redis:6379
+  ACCESS_TOKEN_TTL_MIN: "15"
+---
+# Replace with your secret manager (External Secrets, Sealed Secrets, ...). Values here are placeholders.
+apiVersion: v1
+kind: Secret
+metadata: { name: strawslot-secrets }
+type: Opaque
+stringData:
+  DATABASE_URL: postgres://strawslot:CHANGE_ME@postgres:5432/strawslot
+  JWT_SECRET: CHANGE_ME_32_CHARS_MINIMUM_xxxxxxxxxxxx
+  BOOTSTRAP_OFFICER_PASSWORD: CHANGE_ME
+  BOOTSTRAP_ADMIN_PASSWORD: CHANGE_ME
+  METRICS_TOKEN: CHANGE_ME

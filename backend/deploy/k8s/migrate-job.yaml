@@ -1,0 +1,15 @@
+# Run before each rollout (Helm pre-upgrade hook / Argo PreSync / `kubectl apply` then wait). Idempotent, advisory-locked.
+apiVersion: batch/v1
+kind: Job
+metadata: { name: strawslot-migrate }
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: strawslot/backend:latest
+          command: ["node", "dist/scripts/migrate.js"]
+          envFrom: [{ configMapRef: { name: strawslot-config } }, { secretRef: { name: strawslot-secrets } }]

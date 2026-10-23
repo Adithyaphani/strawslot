@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: strawslot-api, labels: { app: strawslot-api } }
+spec:
+  replicas: 3
+  strategy: { type: RollingUpdate, rollingUpdate: { maxUnavailable: 0, maxSurge: 1 } }
+  selector: { matchLabels: { app: strawslot-api } }
+  template:
+    metadata:
+      labels: { app: strawslot-api }
+      annotations: { prometheus.io/scrape: "true", prometheus.io/port: "8080", prometheus.io/path: /metrics }
+    spec:
+      terminationGracePeriodSeconds: 45     # > readiness grace + drain
+      securityContext: { runAsNonRoot: true, runAsUser: 1000 }
+      containers:
+        - name: api
+          image: strawslot/backend:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: strawslot-config } }, { secretRef: { name: strawslot-secrets } }]
+          resources: { requests: { cpu: 250m, memory: 256Mi }, limits: { cpu: "1", memory: 512Mi } }
+          startupProbe: { httpGet: { path: /health/live, port: 8080 }, failureThreshold: 30, periodSeconds: 2 }
+          livenessProbe: { httpGet: { path: /health/live, port: 8080 }, periodSeconds: 10 }
+          readinessProbe: { httpGet: { path: /health/ready, port: 8080 }, periodSeconds: 5, failureThreshold: 2 }
+          lifecycle: { preStop: { exec: { command: ["sleep", "5"] } } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: strawslot-api }
+spec:
+  selector: { app: strawslot-api }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: strawslot-api }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: strawslot-api }
+  minReplicas: 3
+  maxReplicas: 12
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 65 } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: strawslot-api }
+spec:
+  minAvailable: 2
+  selector: { matchLabels: { app: strawslot-api } }

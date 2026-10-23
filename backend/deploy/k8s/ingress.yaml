@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: strawslot
+  annotations: { nginx.ingress.kubernetes.io/proxy-body-size: 1m, cert-manager.io/cluster-issuer: letsencrypt }
+spec:
+  ingressClassName: nginx
+  tls: [{ hosts: [api.strawslot.example], secretName: strawslot-tls }]
+  rules:
+    - host: api.strawslot.example
+      http:
+        paths:
+          - { path: /, pathType: Prefix, backend: { service: { name: strawslot-api, port: { number: 80 } } } }
