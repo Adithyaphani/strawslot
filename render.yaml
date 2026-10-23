@@ -24,11 +24,11 @@ services:
       - { key: TRUST_PROXY, value: "2" }                          # Netlify proxy + Render proxy
       - { key: LOG_LEVEL, value: info }
       - { key: FIRMS_MAP_KEY, sync: false }                       # optional: live NASA fire data
-keyValue:
-  - name: strawslot-cache
+  - type: keyvalue
+    name: strawslot-cache
     plan: free
     maxmemoryPolicy: allkeys-lru
-    ipAllowList: []                                               # internal connections only
+    ipAllowList: []                                             # internal connections only
 databases:
   - name: strawslot-db
     plan: free
