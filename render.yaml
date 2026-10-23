@@ -1,0 +1,36 @@
+# Render Blueprint: runs the production backend (backend/) with Postgres and Redis.
+# Render dashboard -> New -> Blueprint -> pick this repo. Free plans are fine for a demo
+# (the API sleeps after ~15 min idle and the free Postgres expires after 30 days).
+services:
+  - type: web
+    name: strawslot-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health/ready
+    envVars:
+      - { key: NODE_ENV, value: production }
+      - { key: DATABASE_URL, fromDatabase: { name: strawslot-db, property: connectionString } }
+      - { key: REDIS_URL, fromService: { type: keyvalue, name: strawslot-cache, property: connectionString } }
+      - { key: JWT_SECRET, generateValue: true }
+      - { key: METRICS_TOKEN, generateValue: true }
+      - { key: BOOTSTRAP_OFFICER_PASSWORD, value: sangrur2026 }   # public demo login used by the one-click demo card
+      - { key: BOOTSTRAP_ADMIN_PASSWORD, generateValue: true }    # read it in the Render dashboard if you need the admin account
+      - { key: RUN_WORKER_IN_API, value: "true" }                 # one free service runs the API and the worker together
+      - { key: MIGRATE_ON_BOOT, value: "true" }
+      - { key: DEMO_AUTO_RESEED, value: "true" }
+      - { key: ACCESS_TOKEN_TTL_MIN, value: "15" }                # the web app renews sessions with the refresh token
+      - { key: TRUST_PROXY, value: "2" }                          # Netlify proxy + Render proxy
+      - { key: LOG_LEVEL, value: info }
+      - { key: FIRMS_MAP_KEY, sync: false }                       # optional: live NASA fire data
+keyValue:
+  - name: strawslot-cache
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []                                               # internal connections only
+databases:
+  - name: strawslot-db
+    plan: free
+    databaseName: strawslot
+    user: strawslot
