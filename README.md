@@ -18,10 +18,17 @@ A deadline-aware scheduler that books crop-residue machines, tractors and straw 
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?style=flat-square&logo=express&logoColor=white)
 ![Zod](https://img.shields.io/badge/Zod-validation-3E67B1?style=flat-square)
-![Netlify](https://img.shields.io/badge/Netlify-Functions%20%2B%20Blobs-00C7B7?style=flat-square&logo=netlify&logoColor=white)
+![Netlify](https://img.shields.io/badge/Netlify%20%2B%20Render-hosted-00C7B7?style=flat-square&logo=netlify&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-analytics-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-self--host-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![CI](https://img.shields.io/badge/GitHub%20Actions-CI-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+
+<p align="center">
+<a href="https://incredible-boba-5a35b8.netlify.app"><b>▶ Live demo</b></a> ·
+<a href="https://strawslot-api.onrender.com/docs">API docs</a> ·
+<a href="backend/README.md">Production backend</a><br/>
+<sub>The web app runs on Netlify and talks to the production backend on Render (Postgres + Redis). Free tier: the first request after idle can take up to a minute. Demo login: <code>officer</code> / <code>sangrur2026</code>, or tap "Try the demo".</sub>
+</p>
 
 [**How it works**](#how-it-works) · [**Screenshots**](#screenshots) · [**Run locally**](#run-locally) · [**Backend**](#-production-backend)
 
@@ -247,7 +254,7 @@ Tests: `npm test` (node:test via tsx) runs 11 engine tests covering capacity, ha
 | Tool | Command | What it does |
 |---|---|---|
 | Python | `python3 analytics/season_report.py` | Recomputes season totals from the exported CSV, independent of the TypeScript engine |
-| Shell | `./scripts/smoke-test.sh https://your-site.netlify.app` | Post-deploy check of health, validation, auth and the officer API |
+| Shell | `./scripts/smoke-test.sh https://incredible-boba-5a35b8.netlify.app` | Post-deploy check of health, validation, auth and the officer API |
 | Docker | `docker build -t strawslot . && docker run -p 8787:8787 strawslot` | Self-host the whole app |
 | GitHub Actions | `.github/workflows/ci.yml` | Typecheck, tests, build and the Python report on every push |
 
